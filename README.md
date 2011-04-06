@@ -6,6 +6,6 @@ Usage:
 
 `cd "DirectoryOfTheNinjaVM"`
 
-`gcc -o njvm njvm.c`
+`make njvm`
 
 `./njvm`
