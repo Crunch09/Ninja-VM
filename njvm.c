@@ -35,10 +35,10 @@ int main(int argc, char *argv[]){
 		  /* Hilfe ausgeben */
   		if(strcmp(argv[i],"--help")==0){
 	      printHelp();
-		  }else if(strcmp(argv[i],"--version")==0){
+		}else if(strcmp(argv[i],"--version")==0){
 			  /* Versionsinformationen ausgeben */
 			  printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
-		  }else if(strcmp(argv[i],"--program")==0){
+		}else if(strcmp(argv[i],"--program")==0){
         if(strcmp(argv[i+1],"1")==0){}
           /*program1();*/
         else if(strcmp(argv[i+1],"2")==0){}
@@ -79,34 +79,30 @@ void program(void){
     instruction=(code1[i]&0xFF000000)>>24;
 
     if(instruction==HALT){
-      printf("%3d: halt\n",count);
+      printf("%03d: halt\n",count);
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
       printf("%3d: pushc  %d\n",count,(code1[i]&0x00FFFFFF));
       stack[stackPosition]=(code1[i]&0x00FFFFFF);
       stackPosition++;
-      count++;
     }else if(instruction==ADD){
       printf("%3d: add\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF; /*Zahl oberste im Stack herausgenommen*/
       n2=stack[stackPosition-2]&0x00FFFFFF; /*Zahl, zweite von oben im Stack herausgenommen*/
       stack[stackPosition-2]=n1+n2; /*rechenoperation*/
       stackPosition--; /*stackposition veraendern*/
-      count++; /*count fuer Zeilenausgabe*/
     }else if(instruction==SUB){
       printf("%3d: sub\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       stack[stackPosition-2]=n1-n2;
       stackPosition--;
-      count++;
     }else if(instruction==MUL){
       printf("%3d: mul\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       stack[stackPosition-2]=n1*n2;
       stackPosition--;
-      count++;
     }else if(instruction==DIV){
       printf("%3d: div\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
@@ -116,18 +112,18 @@ void program(void){
         stack[stackPosition-2]=n1/n2;
       }
       stackPosition--;
-      count++;
     }else if(instruction==MOD){
       printf("%3d: mod\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       stack[stackPosition-2]=n1%n2;
       stackPosition--;
-      count++;
     }else if(instruction==RDINT){
     }else if(instruction==WRINT){
       printf("%3d: wrint %d\n",count,SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
     }
+    /* count für Zeilenausgabe erhöhen */
+	count++;
   }
 
   stackPosition=0;
