@@ -9,13 +9,19 @@
 #define MUL 4
 #define DIV 5
 #define MOD 6
-#define rdint 7
-#define wrint 8
+#define RDINT 7
+#define WRINT 8
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 
 const char version[] = "0.1";
-
+unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
+                        (PUSHC << 24) | IMMEDIATE(4),
+                        (ADD << 24),
+                        (PUSHC << 24) | IMMEDIATE(10),
+                        (PUSHC << 24) | IMMEDIATE(6),
+                        (SUB << 24),(MUL << 24),
+                        (WRINT << 24),(HALT << 24)};
 
 
 
@@ -36,7 +42,7 @@ int main(int argc, char *argv[]){
           /*program2();*/
 	    }else{
         /* Unbekannter Befehl */
-			  printf("unknown command line argument '%s', try './njvm --help' \n", argv[1]);
+			  printf("unknown command line argument '%s', try './njvm --help' \n", argv[i]);
 		  }
     }
 	}else{
