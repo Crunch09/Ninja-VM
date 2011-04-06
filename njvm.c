@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "njvm.h"
 
 int main(int argc, char *argv[]){
 	
