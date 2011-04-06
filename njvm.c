@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include "njvm.h"
 
 const char version[] = "0.1";
 
-void printHelp(void);
+
 
 
 int main(int argc, char *argv[]){
