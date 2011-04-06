@@ -132,6 +132,7 @@ void program(void){
       stack[stackPosition-2]=n1%n2;
       stackPosition--;
     }else if(instruction==RDINT){
+	  /* liest Zahl auf der konsole ein */
 	  scanf("%d", &eingeleseneZahl);
 	  printf("%03d: rdint %d\n",count, eingeleseneZahl);
 	 stack[stackPosition] = eingeleseneZahl;
