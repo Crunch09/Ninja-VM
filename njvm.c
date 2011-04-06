@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "njvm.h"
 
 #define HALT 0
 #define PUSHC 1
@@ -15,7 +16,7 @@
 
 const char version[] = "0.1";
 
-void printHelp(void);
+
 
 
 int main(int argc, char *argv[]){
