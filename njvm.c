@@ -23,9 +23,16 @@ unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
                         (PUSHC << 24) | IMMEDIATE(4),
                         (ADD << 24),
                         (PUSHC << 24) | IMMEDIATE(10),
-                        (PUSHC << 24) | IMMEDIATE(4),
+                        (PUSHC << 24) | IMMEDIATE(6),
                         (SUB << 24),(MUL << 24),
                         (WRINT << 24),(HALT << 24)};
+
+unsigned int code2[] = {(PUSHC << 24) | IMMEDIATE(-2),
+	                    (RDINT << 24),
+	                    (MUL << 24),
+	                    (PUSHC << 24) | IMMEDIATE(3),
+	                    (ADD << 24),
+						(WRINT << 24), (HALT << 24)};
 
 
 int main(int argc, char *argv[]){
@@ -41,6 +48,7 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[i],"--program")==0){
         if(strcmp(argv[i+1],"1")==0){}
           /*program1();*/
+          
         else if(strcmp(argv[i+1],"2")==0){}
           /*program2();*/
 	    }else{
@@ -55,11 +63,15 @@ int main(int argc, char *argv[]){
 	}
 	
 	program();
+	
+	
 	return 0;
 }
 
 /* Ausgabe von Option */
 void printHelp(void){
+	
+	
   printf("./njvm [option] [option] ...\n");
   printf("--program 1\n");
   printf("--program 2\n");
@@ -69,42 +81,43 @@ void printHelp(void){
 
 /*code1 und code2 ausfuehren*/
 void program(void){
-  int count, instruction, i, n1, n2;
+  int count, instruction, i, n1, n2, eingeleseneZahl;
   count=0;
 
   printf("Ninja Virtual Machine started\n");
 
   /*geht jede Instruktion der Instruktionstabelle durch*/
-  for(i=0;i<sizeof(code1)/sizeof(int);i++){
-    instruction=(code1[i]&0xFF000000)>>24;
+  for(i=0;i<sizeof(code2)/sizeof(int);i++){
+    instruction=(code2[i]&0xFF000000)>>24;
 
     if(instruction==HALT){
       printf("%03d: halt\n",count);
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
-      printf("%3d: pushc  %d\n",count,(code1[i]&0x00FFFFFF));
-      stack[stackPosition]=(code1[i]&0x00FFFFFF);
+      printf("%03d: pushc  %d\n",count,(code2[i]&0x00FFFFFF));
+      stack[stackPosition]=(code2[i]&0x00FFFFFF);
+	  /* printf("\n test %04d\n", stack[stackPosition]); */
       stackPosition++;
     }else if(instruction==ADD){
-      printf("%3d: add\n",count);
+      printf("%03d: add\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF; /*Zahl oberste im Stack herausgenommen*/
       n2=stack[stackPosition-2]&0x00FFFFFF; /*Zahl, zweite von oben im Stack herausgenommen*/
       stack[stackPosition-2]=n1+n2; /*rechenoperation*/
       stackPosition--; /*stackposition veraendern*/
     }else if(instruction==SUB){
-      printf("%3d: sub\n",count);
-      n1=stack[stackPosition-1]&0x00FFFFFF;
-      n2=stack[stackPosition-2]&0x00FFFFFF;
+      printf("%03d: sub\n",count);
+      n1=stack[stackPosition-2]&0x00FFFFFF;
+      n2=stack[stackPosition-1]&0x00FFFFFF;
       stack[stackPosition-2]=n1-n2;
       stackPosition--;
     }else if(instruction==MUL){
-      printf("%3d: mul\n",count);
+      printf("%03d: mul\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       stack[stackPosition-2]=n1*n2;
       stackPosition--;
     }else if(instruction==DIV){
-      printf("%3d: div\n",count);
+      printf("%03d: div\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       /*teilen durch null abfangen*/
@@ -113,14 +126,18 @@ void program(void){
       }
       stackPosition--;
     }else if(instruction==MOD){
-      printf("%3d: mod\n",count);
+      printf("%03d: mod\n",count);
       n1=stack[stackPosition-1]&0x00FFFFFF;
       n2=stack[stackPosition-2]&0x00FFFFFF;
       stack[stackPosition-2]=n1%n2;
       stackPosition--;
     }else if(instruction==RDINT){
+	  scanf("%d", &eingeleseneZahl);
+	  printf("%03d: rdint %d\n",count, eingeleseneZahl);
+	 stack[stackPosition] = eingeleseneZahl;
+	 stackPosition++;
     }else if(instruction==WRINT){
-      printf("%3d: wrint %d\n",count,SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
+      printf("%03d: wrint %d\n",count,SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
     }
     /* count für Zeilenausgabe erhöhen */
 	count++;
