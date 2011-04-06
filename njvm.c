@@ -1,6 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#define HALT 0
+#define PUSHC 1
+#define ADD 2 
+#define SUB 3
+#define MUL 4
+#define DIV 5
+#define MOD 6
+#define rdint 7
+#define wrint 8
+
+#define IMMEDIATE(x) ((x) & 0x00FFFFFF)
+
 const char version[] = "0.1";
 
 void printHelp(void);
