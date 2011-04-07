@@ -1,2 +1,2 @@
 void printHelp(void);
-void program(void);
+void program(unsigned int *code, int size);

@@ -28,11 +28,11 @@ unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
                         (WRINT << 24),(HALT << 24)};
 
 unsigned int code2[] = {(PUSHC << 24) | IMMEDIATE(-2),
-	                    (RDINT << 24),
-	                    (MUL << 24),
-	                    (PUSHC << 24) | IMMEDIATE(3),
-	                    (ADD << 24),
-						(WRINT << 24), (HALT << 24)};
+	                      (RDINT << 24),
+	                      (MUL << 24),
+	                      (PUSHC << 24) | IMMEDIATE(3),
+	                      (ADD << 24),
+                        (WRINT << 24), (HALT << 24)};
 
 
 int main(int argc, char *argv[]){
@@ -42,36 +42,36 @@ int main(int argc, char *argv[]){
 		  /* Hilfe ausgeben */
   		if(strcmp(argv[i],"--help")==0){
 	      printHelp();
-		}else if(strcmp(argv[i],"--version")==0){
+		  }else if(strcmp(argv[i],"--version")==0){
 			  /* Versionsinformationen ausgeben */
 			  printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
-		}else if(strcmp(argv[i],"--program")==0){
-        if(strcmp(argv[i+1],"1")==0){}
-          /*program1();*/
-          
-        else if(strcmp(argv[i+1],"2")==0){}
-          /*program2();*/
+		  }else if(strcmp(argv[i],"--program")==0){
+        if(strcmp(argv[i+1],"1")==0){
+        	program(code1,sizeof(code1)/sizeof(int));
+          break;
+        }
+        else if(strcmp(argv[i+1],"2")==0){
+        	program(code2,sizeof(code2)/sizeof(int));
+          break;
+        }
 	    }else{
         /* Unbekannter Befehl */
 			  printf("unknown command line argument '%s', try './njvm --help' \n", argv[i]);
 		  }
     }
 	}else{
-		/* Keine Parameter angegeben 
-		printf("Ninja Virtual Machine started\n");
-		printf("Ninja Virtual Machine stopped\n");*/
+		printf("No Arguments, try --help.\n");
 	}
-	
-	program();
+
+
 	
 	
 	return 0;
 }
 
+
 /* Ausgabe von Option */
 void printHelp(void){
-	
-	
   printf("./njvm [option] [option] ...\n");
   printf("--program 1\n");
   printf("--program 2\n");
@@ -79,23 +79,24 @@ void printHelp(void){
   printf("--version  print version of programm\n");
 }
 
+
 /*code1 und code2 ausfuehren*/
-void program(void){
+void program(unsigned int *code,int size){
   int count, instruction, i, n1, n2, eingeleseneZahl;
   count=0;
 
   printf("Ninja Virtual Machine started\n");
 
   /*geht jede Instruktion der Instruktionstabelle durch*/
-  for(i=0;i<sizeof(code2)/sizeof(int);i++){
-    instruction=(code2[i]&0xFF000000)>>24;
+  for(i=0;i<size;i++){
+    instruction=(code[i]&0xFF000000)>>24;
 
     if(instruction==HALT){
       printf("%03d: halt\n",count);
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
-      printf("%03d: pushc  %d\n",count,(code2[i]&0x00FFFFFF));
-      stack[stackPosition]=(code2[i]&0x00FFFFFF);
+      printf("%03d: pushc  %d\n",count,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+      stack[stackPosition]=(code[i]&0x00FFFFFF);
 	  /* printf("\n test %04d\n", stack[stackPosition]); */
       stackPosition++;
     }else if(instruction==ADD){
@@ -132,16 +133,16 @@ void program(void){
       stack[stackPosition-2]=n1%n2;
       stackPosition--;
     }else if(instruction==RDINT){
-	  /* liest Zahl auf der konsole ein */
-	  scanf("%d", &eingeleseneZahl);
-	  printf("%03d: rdint %d\n",count, eingeleseneZahl);
-	 stack[stackPosition] = eingeleseneZahl;
-	 stackPosition++;
+	    /* liest Zahl auf der konsole ein */
+	    printf("%03d: rdint ",count);
+	    scanf("%d", &eingeleseneZahl);
+	    stack[stackPosition] = eingeleseneZahl;
+	    stackPosition++;
     }else if(instruction==WRINT){
       printf("%03d: wrint %d\n",count,SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
     }
     /* count für Zeilenausgabe erhöhen */
-	count++;
+	  count++;
   }
 
   stackPosition=0;
