@@ -170,11 +170,15 @@ void program(unsigned int *code,int size){
       scanf("%d", &eingeleseneZahl);
       push(eingeleseneZahl);
     }else if(instruction==WRINT){
-      printf("%d\n",SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
+      printf("%d\n",SIGN_EXTEND(stack[stackPointer-1]&0x00FFFFFF));
     }else if(instruction==ASF){
+      
     }else if(instruction==RSF){
+      
     }else if(instruction==PUSHL){
+      
     }else if(instruction==POPL){
+      
     }
   }
 
