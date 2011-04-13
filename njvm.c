@@ -26,7 +26,7 @@
 const char version[] = "0.1";
 /*const int stackSize = 1024;*/
 int stack[stackSize];
-int stackPosition=0;
+int stackPointer=0;
 int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
 unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
@@ -49,29 +49,28 @@ int main(int argc, char *argv[]){
   if(argc >= 2){
     int i;
     for(i=1;i<argc;i++){
-		  /* Hilfe ausgeben */
-  	if(strcmp(argv[i],"--help")==0){
-	      printHelp();
-        }else if(strcmp(argv[i],"--version")==0){
-	      /* Versionsinformationen ausgeben */
-	      printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
-        }else if(strcmp(argv[i],"--program")==0){
-           if(strcmp(argv[i+1],"1")==0){
-        	program(code1,sizeof(code1)/sizeof(code1[0]));
-                break;
-           }
-           else if(strcmp(argv[i+1],"2")==0){
-        	program(code2,sizeof(code2)/sizeof(code2[0]));
-                break;
-           }
-	}else{
-        /* Unbekannter Befehl */
-	   printf("unknown command line argument '%s', try './njvm --help' \n", argv[i]);
+      /* Hilfe ausgeben */
+      if(strcmp(argv[i],"--help")==0){
+        printHelp();
+      }else if(strcmp(argv[i],"--version")==0){
+        /* Versionsinformationen ausgeben */
+        printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
+      }else if(strcmp(argv[i],"--program")==0){
+        if(strcmp(argv[i+1],"1")==0){
+	  program(code1,sizeof(code1)/sizeof(code1[0]));
+          break;
+        }else if(strcmp(argv[i+1],"2")==0){
+	  program(code2,sizeof(code2)/sizeof(code2[0]));
+          break;
         }
-     }
-   }else{
-	   printf("No Arguments, try --help.\n");
-	}
+      }else{
+        /* Unbekannter Befehl */
+	printf("unknown command line argument '%s', try './njvm --help' \n", argv[i]);
+      }
+    }
+  }else{
+    printf("No Arguments, try --help.\n");
+  }
 
    return 0;
 }
@@ -122,7 +121,7 @@ void printProgram(unsigned int *code, int size){
       printf("%03d: popl\n",programCounter);
     }
 
-     programCounter++;
+    programCounter++;
     
   }
   programCounter = 0;
@@ -141,81 +140,64 @@ void program(unsigned int *code,int size){
     instruction=(code[i]&0xFF000000)>>24;
 
     if(instruction==HALT){
-      /*printf("%03d: halt\n",programCounter);*/
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
-      /*printf("%03d: pushc  %d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));*/
       push(code[i]);
-
     }else if(instruction==ADD){
-      /*printf("%03d: add\n",programCounter);*/
       n1=pop();
       n2=pop();
       push(n2+n1);
-
     }else if(instruction==SUB){
-      /*printf("%03d: sub\n",programCounter);*/
       n1=pop();
       n2=pop();
       push(n2-n1);
-
     }else if(instruction==MUL){
-      /*printf("%03d: mul\n",programCounter);*/
       n1=pop();
       n2=pop();
       push(n2*n1);
-
     }else if(instruction==DIV){
-      /*printf("%03d: div\n",programCounter);*/
       n1=pop();
       n2=pop();
-
+      
       if(n2!=0){
-        /*stack[stackPosition-2]=n1/n2;*/
         push(n2/n1);
       }
-      /*stackPosition--;*/
     }else if(instruction==MOD){
-      /*printf("%03d: mod\n",programCounter);*/
       n1=pop();
       n2=pop();
       push(n1%n2);
-
     }else if(instruction==RDINT){
-	    /* liest Zahl auf der konsole ein */
-	    /*printf("%03d: rdint ",programCounter);*/
-	    scanf("%d", &eingeleseneZahl);
+      scanf("%d", &eingeleseneZahl);
       push(eingeleseneZahl);
-	    /*stack[stackPosition] = eingeleseneZahl;
-	    stackPosition++;*/
     }else if(instruction==WRINT){
       printf("%d\n",SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
+    }else if(instruction==ASF){
+    }else if(instruction==RSF){
+    }else if(instruction==PUSHL){
+    }else if(instruction==POPL){
     }
-    /* count für Zeilenausgabe erhöhen */
-	 /* programCounter++;*/
   }
 
-  stackPosition=0;
-  /*programCounter=0;*/
+  stackPointer=0;
   printf("Ninja Virtual Machine stopped\n");
 }
 
 void push(int num){
-  stack[stackPosition]=(num&0x00FFFFFF);
-  stackPosition++;
+  stack[stackPointer]=(num&0x00FFFFFF);
+  stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
-  if(stackPosition > stackSize){
+  if(stackPointer > stackSize){
     printf("Stackposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
 }
 
 int pop(void){
-  stackPosition--;
+  stackPointer--;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
-  if(stackPosition < 0){
+  if(stackPointer < 0){
     printf("Stackposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
-  return stack[stackPosition];
+  return stack[stackPointer];
 }
