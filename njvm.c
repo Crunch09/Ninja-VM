@@ -4,7 +4,7 @@
 #include "njvm.h"
 
 #define HALT 0
-#define PUSHC 1
+#define PUSHC 1 /*pushc <n>*/
 #define ADD 2 
 #define SUB 3
 #define MUL 4
@@ -12,6 +12,11 @@
 #define MOD 6
 #define RDINT 7
 #define WRINT 8
+
+#define ASF 9 /*asf <n>*/
+#define RSF 10
+#define PUSHL 11 /*pushl <n>*/
+#define POPL 12 /*popl <n>*/
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
@@ -22,6 +27,7 @@ const char version[] = "0.1";
 /*const int stackSize = 1024;*/
 int stack[stackSize];
 int stackPosition=0;
+int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
 unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
                         (PUSHC << 24) | IMMEDIATE(4),
@@ -86,27 +92,35 @@ void printProgram(unsigned int *code, int size){
   
   for(i=0;i<size;i++){
      
-     zeile = (code[i]&0xFF000000)>>24;
+    zeile = (code[i]&0xFF000000)>>24;
   
-     if(zeile==HALT){
-       printf("%03d: halt\n",programCounter);
-     }else if(zeile==PUSHC){
-       printf("%03d: pushc %d\n", programCounter, (SIGN_EXTEND(code[i]&0x00FFFFFF)));
-     }else if(zeile==ADD){
-       printf("%03d: add\n",programCounter);
-     }else if(zeile==SUB){
-       printf("%03d: sub\n",programCounter);
-     }else if(zeile==MUL){
-       printf("%03d: mul\n",programCounter);
-     }else if(zeile==DIV){
-       printf("%03d: div\n",programCounter);
-     }else if(zeile==MOD){
-       printf("%03d: mod\n",programCounter);
-     }else if(zeile==RDINT){
-       printf("%03d: rdint \n",programCounter);
-     }else if(zeile==WRINT){
-       printf("%03d: wrint \n",programCounter);
-     }
+    if(zeile==HALT){
+      printf("%03d: halt\n",programCounter);
+    }else if(zeile==PUSHC){
+      printf("%03d: pushc %d\n", programCounter, (SIGN_EXTEND(code[i]&0x00FFFFFF)));
+    }else if(zeile==ADD){
+      printf("%03d: add\n",programCounter);
+    }else if(zeile==SUB){
+      printf("%03d: sub\n",programCounter);
+    }else if(zeile==MUL){
+      printf("%03d: mul\n",programCounter);
+    }else if(zeile==DIV){
+      printf("%03d: div\n",programCounter);
+    }else if(zeile==MOD){
+      printf("%03d: mod\n",programCounter);
+    }else if(zeile==RDINT){
+      printf("%03d: rdint\n",programCounter);
+    }else if(zeile==WRINT){
+      printf("%03d: wrint\n",programCounter);
+    }else if(zeile==ASF){
+      printf("%03d: asf\n",programCounter);
+    }else if(zeile==RSF){
+      printf("%03d: rsf\n",programCounter);
+    }else if(zeile==PUSHL){
+      printf("%03d: pushl\n",programCounter);
+    }else if(zeile==POPL){
+      printf("%03d: popl\n",programCounter);
+    }
 
      programCounter++;
     
