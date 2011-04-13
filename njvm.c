@@ -29,6 +29,7 @@ int stack[stackSize];
 int stackPointer=0;
 int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
+
 unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
                         (PUSHC << 24) | IMMEDIATE(4),
                         (ADD << 24),
@@ -44,6 +45,24 @@ unsigned int code2[] = {(PUSHC << 24) | IMMEDIATE(-2),
 	                (ADD << 24),
                         (WRINT << 24), (HALT << 24)};
 
+unsigned int code3[] = {(ASF<<24)|IMMEDIATE(2),
+			(PUSHC<<24)|IMMEDIATE(2),
+			(POPL<<24)|IMMEDIATE(0),
+			(PUSHL<<24)|IMMEDIATE(0),
+			(PUSHC<<24)|IMMEDIATE(3),
+			(ADD<<24),
+			(POPL<<24)|IMMEDIATE(1),
+			(PUSHC<<24)|IMMEDIATE(7),
+			(PUSHL<<24)|IMMEDIATE(1),
+			(MUL<<24),
+			(PUSHL<<24)|IMMEDIATE(0),
+			(ADD<<24),
+			(POPL<<24)|IMMEDIATE(0),
+			(PUSHL<<24)|IMMEDIATE(0),
+			(PUSHC<<24)|IMMEDIATE(-33),
+			(ADD<<24),(WRINT<<24),
+			(RSF<<24),(HALT<<24)};
+
 
 int main(int argc, char *argv[]){
   if(argc >= 2){
@@ -57,7 +76,7 @@ int main(int argc, char *argv[]){
         printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
       }else if(strcmp(argv[i],"--program")==0){
         if(strcmp(argv[i+1],"1")==0){
-	  program(code1,sizeof(code1)/sizeof(code1[0]));
+	  program(code3,sizeof(code3)/sizeof(code3[0]));
           break;
         }else if(strcmp(argv[i+1],"2")==0){
 	  program(code2,sizeof(code2)/sizeof(code2[0]));
@@ -96,7 +115,7 @@ void printProgram(unsigned int *code, int size){
     if(zeile==HALT){
       printf("%03d: halt\n",programCounter);
     }else if(zeile==PUSHC){
-      printf("%03d: pushc %d\n", programCounter, (SIGN_EXTEND(code[i]&0x00FFFFFF)));
+      printf("%03d: pushc %5d\n", programCounter, (SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==ADD){
       printf("%03d: add\n",programCounter);
     }else if(zeile==SUB){
@@ -112,13 +131,13 @@ void printProgram(unsigned int *code, int size){
     }else if(zeile==WRINT){
       printf("%03d: wrint\n",programCounter);
     }else if(zeile==ASF){
-      printf("%03d: asf\n",programCounter);
+      printf("%03d: asf %7d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==RSF){
       printf("%03d: rsf\n",programCounter);
     }else if(zeile==PUSHL){
-      printf("%03d: pushl\n",programCounter);
+      printf("%03d: pushl %5d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==POPL){
-      printf("%03d: popl\n",programCounter);
+      printf("%03d: popl %6d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }
 
     programCounter++;
@@ -170,24 +189,42 @@ void program(unsigned int *code,int size){
       scanf("%d", &eingeleseneZahl);
       push(eingeleseneZahl);
     }else if(instruction==WRINT){
-      printf("%d\n",SIGN_EXTEND(stack[stackPointer-1]&0x00FFFFFF));
-    }else if(instruction==ASF){
-      
-    }else if(instruction==RSF){
-      
-    }else if(instruction==PUSHL){
-      
-    }else if(instruction==POPL){
-      
+      printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
+    }else if(instruction==ASF){ /*stack frame anlegen, mit groesse n*/
+      push(framePointer);/*position des letzten frames wird gemerkt*/
+      framePointer=stackPointer;
+      stackPointer=stackPointer+(IMMEDIATE(code[i]));
+    }else if(instruction==RSF){ /*benutzen stack frame entfernen*/
+      stackPointer=framePointer;
+      framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
+    }else if(instruction==PUSHL){ /*variable von frame wird in stack geschrieben*/
+      n2=popFrame(code[i]);
+      push(n2);
+    }else if(instruction==POPL){ /*wert vom stack wird in frame geschrieben*/
+      n1=pop();
+      pushFrame(n1,code[i]);
     }
   }
 
   stackPointer=0;
+  framePointer=0;
   printf("Ninja Virtual Machine stopped\n");
 }
 
+
+/*push und pop funktionen fuer frame stack*/
+void pushFrame(int num, int point){
+  int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
+  stack[i]=num;
+}
+int popFrame(int point){
+  int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
+  return stack[i];
+}
+
+
 void push(int num){
-  stack[stackPointer]=(num&0x00FFFFFF);
+  stack[stackPointer]=SIGN_EXTEND(IMMEDIATE(num));/*(num&0x00FFFFFF);*/
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){
