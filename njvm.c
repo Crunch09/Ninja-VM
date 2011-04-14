@@ -156,12 +156,12 @@ void program(unsigned int *code,int size){
 
   /*geht jede Instruktion der Instruktionstabelle durch*/
   for(programCounter=0;programCounter<size;programCounter++){
-    instruction=(code[i]&0xFF000000)>>24;
+    instruction=(code[programCounter]&0xFF000000)>>24;
 
     if(instruction==HALT){
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
-      push(code[i]);
+      push(code[programCounter]);
     }else if(instruction==ADD){
       n1=pop();
       n2=pop();
@@ -192,17 +192,19 @@ void program(unsigned int *code,int size){
       printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
     }else if(instruction==ASF){ /*stack frame anlegen, mit groesse n*/
       push(framePointer);/*position des letzten frames wird gemerkt*/
+      push(IMMEDIATE(code[programCounter]));
       framePointer=stackPointer;
-      stackPointer=stackPointer+(IMMEDIATE(code[i]));
+      stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
     }else if(instruction==RSF){ /*benutzen stack frame entfernen*/
       stackPointer=framePointer;
+      pop();
       framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
     }else if(instruction==PUSHL){ /*variable von frame wird in stack geschrieben*/
-      n2=popFrame(code[i]);
+      n2=popFrame(code[programCounter]);
       push(n2);
     }else if(instruction==POPL){ /*wert vom stack wird in frame geschrieben*/
       n1=pop();
-      pushFrame(n1,code[i]);
+      pushFrame(n1,code[programCounter]);
     }
   }
 
@@ -215,10 +217,20 @@ void program(unsigned int *code,int size){
 /*push und pop funktionen fuer frame stack*/
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
+  /*pruefen das stack frame nicht auf stack l*/
+  if(framePointer>(framePointer+stack[framePointer-1])){
+    printf("Frameposition out of Range. Program will be stopped.\n");
+    exit(-99);
+  }
   stack[i]=num;
 }
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
+  /*pruefen das stack frame nicht auf stack l*/
+  if(framePointer>(framePointer+stack[framePointer-1])){
+    printf("Frameposition out of Range. Program will be stopped.\n");
+    exit(-99);
+  }
   return stack[i];
 }
 
