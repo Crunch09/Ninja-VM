@@ -28,47 +28,12 @@ int stack[stackSize];
 int stackPointer=0;
 int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
-<<<<<<< HEAD
 FILE *codeFile;
 int fileSize, numberOfCommands;
 unsigned int *programPointer;
-=======
-
-unsigned int code1[] = {(PUSHC << 24) | IMMEDIATE(3),
-                        (PUSHC << 24) | IMMEDIATE(4),
-                        (ADD << 24),
-                        (PUSHC << 24) | IMMEDIATE(10),
-                        (PUSHC << 24) | IMMEDIATE(6),
-                        (SUB << 24),(MUL << 24),
-                        (WRINT << 24),(HALT << 24)};
-
-unsigned int code2[] = {(PUSHC << 24) | IMMEDIATE(-2),
-	                (RDINT << 24),
-	                (MUL << 24),
-	                (PUSHC << 24) | IMMEDIATE(3),
-	                (ADD << 24),
-                        (WRINT << 24), (HALT << 24)};
->>>>>>> 0.2
-
-unsigned int code3[] = {(ASF<<24)|IMMEDIATE(2),
-			(PUSHC<<24)|IMMEDIATE(2),
-			(POPL<<24)|IMMEDIATE(0),
-			(PUSHL<<24)|IMMEDIATE(0),
-			(PUSHC<<24)|IMMEDIATE(3),
-			(ADD<<24),
-			(POPL<<24)|IMMEDIATE(1),
-			(PUSHC<<24)|IMMEDIATE(7),
-			(PUSHL<<24)|IMMEDIATE(1),
-			(MUL<<24),
-			(PUSHL<<24)|IMMEDIATE(0),
-			(ADD<<24),
-			(POPL<<24)|IMMEDIATE(0),
-			(PUSHL<<24)|IMMEDIATE(0),
-			(PUSHC<<24)|IMMEDIATE(-33),
-			(ADD<<24),(WRINT<<24),
-			(RSF<<24),(HALT<<24)};
 
 
+/* main */
 int main(int argc, char *argv[]){
   if(argc >= 2){
     int i, fileClosed;
@@ -78,7 +43,6 @@ int main(int argc, char *argv[]){
         printHelp();
       }else if(strcmp(argv[i],"--version")==0){
         /* Versionsinformationen ausgeben */
-<<<<<<< HEAD
         printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__); 
       }else{
         codeFile = fopen(argv[i], "r");
@@ -108,20 +72,6 @@ int main(int argc, char *argv[]){
             printf("Warning ! Couldn't close the file. \n");
           }
         }    
-=======
-        printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
-      }else if(strcmp(argv[i],"--program")==0){
-        if(strcmp(argv[i+1],"1")==0){
-	  program(code3,sizeof(code3)/sizeof(code3[0]));
-          break;
-        }else if(strcmp(argv[i+1],"2")==0){
-	  program(code2,sizeof(code2)/sizeof(code2[0]));
-          break;
-        }
-      }else{
-        /* Unbekannter Befehl */
-	printf("unknown command line argument '%s', try './njvm --help' \n", argv[i]);
->>>>>>> 0.2
       }
     }
   }else{
@@ -198,12 +148,7 @@ void program(unsigned int *code,int size){
     if(instruction==HALT){
       break;
     }else if(instruction==PUSHC){ /*schreiben in stack*/
-<<<<<<< HEAD
-      push(code[i]);
-
-=======
       push(code[programCounter]);
->>>>>>> 0.2
     }else if(instruction==ADD){
       n1=pop();
       n2=pop();
@@ -228,10 +173,7 @@ void program(unsigned int *code,int size){
       n2=pop();
       push(n1%n2);
     }else if(instruction==RDINT){
-<<<<<<< HEAD
         /* liest Zahl auf der konsole ein */
-=======
->>>>>>> 0.2
       scanf("%d", &eingeleseneZahl);
       push(eingeleseneZahl);
     }else if(instruction==WRINT){
@@ -252,10 +194,6 @@ void program(unsigned int *code,int size){
       n1=pop();
       pushFrame(n1,code[programCounter]);
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> 0.2
   }
 
   stackPointer=0;
@@ -268,7 +206,7 @@ void program(unsigned int *code,int size){
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
   /*pruefen das stack frame nicht auf stack l*/
-  if(framePointer>(framePointer+stack[framePointer-1])){
+  if(i>=(framePointer+stack[framePointer-1])){
     printf("Frameposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
@@ -277,7 +215,7 @@ void pushFrame(int num, int point){
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
   /*pruefen das stack frame nicht auf stack l*/
-  if(framePointer>(framePointer+stack[framePointer-1])){
+  if(i>=(framePointer+stack[framePointer-1])){
     printf("Frameposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
