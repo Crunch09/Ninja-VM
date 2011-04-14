@@ -31,46 +31,44 @@ int main(int argc, char *argv[]){
   if(argc >= 2){
     int i, fileClosed;
     for(i=1;i<argc;i++){
-		  /* Hilfe ausgeben */
-  	  if(strcmp(argv[i],"--help")==0){
-	      printHelp();
+      /* Hilfe ausgeben */
+      if(strcmp(argv[i],"--help")==0){
+        printHelp();
       }else if(strcmp(argv[i],"--version")==0){
-	      /* Versionsinformationen ausgeben */
-	      printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__);
-      
-	  }else{
-		codeFile = fopen(argv[i], "r");
-		if(codeFile == NULL || (strstr(argv[i], ".bin") == NULL )){
-			printf("Couldn't open %s . You need to use a .bin file. Try again. \n", argv[i]);
-		}else{
-			printf("Opened %s successful. \n", argv[i]);
-			/* Zeiger ans Ende setzen, um Größe zu ermitteln */
-			fseek(codeFile, 0, SEEK_END);
-			fileSize = ftell(codeFile);
-			/* Zeiger wieder an den Anfang setzen */
-			fseek(codeFile, 0, SEEK_SET);
-			programPointer = malloc(fileSize);
-			if( programPointer == NULL){
-				printf("No RAM available. \n");
-				exit(-99);
-			}
-			printf("Size: %d Bytes \n", fileSize);
-			numberOfCommands = fread(programPointer, 4, fileSize/4, codeFile);
-			if(numberOfCommands < fileSize/sizeof(programPointer[0])){
-				printf("There occured an error reading the file.  \n");
-				exit(-99);
-			}
-			program(programPointer, fileSize/sizeof(programPointer[0]));
-			fileClosed = fclose(codeFile);
-			if(fileClosed != 0){
-				printf("Warning ! Couldn't close the file. \n");
-			}
-		}
-       
+        /* Versionsinformationen ausgeben */
+        printf("Ninja Virtual Machine version %s (compiled %s, %s)\n",version,__DATE__,__TIME__); 
+      }else{
+        codeFile = fopen(argv[i], "r");
+        if(codeFile == NULL || (strstr(argv[i], ".bin") == NULL )){
+          printf("Couldn't open %s . You need to use a .bin file. Try again. \n", argv[i]);
+        }else{
+          printf("Opened %s successful. \n", argv[i]);
+          /* Zeiger ans Ende setzen, um Größe zu ermitteln */
+          fseek(codeFile, 0, SEEK_END);
+          fileSize = ftell(codeFile);
+          /* Zeiger wieder an den Anfang setzen */
+          fseek(codeFile, 0, SEEK_SET);
+          programPointer = malloc(fileSize);
+          if( programPointer == NULL){
+            printf("No RAM available. \n");
+            exit(-99);
+          }
+          printf("Size: %d Bytes \n", fileSize);
+          numberOfCommands = fread(programPointer, 4, fileSize/4, codeFile);
+          if(numberOfCommands < fileSize/sizeof(programPointer[0])){
+            printf("There occured an error reading the file.  \n");
+            exit(-99);
+          }
+          program(programPointer, fileSize/sizeof(programPointer[0]));
+          fileClosed = fclose(codeFile);
+          if(fileClosed != 0){
+            printf("Warning ! Couldn't close the file. \n");
+          }
+        }    
       }
     }
   }else{
-	   printf("No Arguments, try --help.\n");
+    printf("No Arguments, try --help.\n");
   }
 
    return 0;
@@ -80,10 +78,11 @@ int main(int argc, char *argv[]){
 /* Ausgabe von Option */
 void printHelp(void){
   printf("./njvm [option] [option] ...\n");
-printf("./njvm path/to/filename.bin executes this code\n");
+  printf("./njvm path/to/filename.bin executes this code\n");
   printf("--help     print this page\n");
   printf("--version  print version of programm\n");
 }
+
 
 /* Gibt das Programm aus */
 void printProgram(unsigned int *code, int size){
@@ -165,8 +164,8 @@ void program(unsigned int *code,int size){
       push(n1%n2);
 
     }else if(instruction==RDINT){
-	    /* liest Zahl auf der konsole ein */
-	  scanf("%d", &eingeleseneZahl);
+        /* liest Zahl auf der konsole ein */
+      scanf("%d", &eingeleseneZahl);
       push(eingeleseneZahl);
     }else if(instruction==WRINT){
       printf("%d\n",SIGN_EXTEND(stack[stackPosition-1]&0x00FFFFFF));
