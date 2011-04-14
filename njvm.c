@@ -148,14 +148,14 @@ void printProgram(unsigned int *code, int size){
 
 /*code1 und code2 ausfuehren*/
 void program(unsigned int *code,int size){
-  int instruction, i, n1, n2, eingeleseneZahl;
+  int instruction, n1, n2, eingeleseneZahl;
 
   printf("Ninja Virtual Machine started\n");
 
   printProgram(code, size);
 
   /*geht jede Instruktion der Instruktionstabelle durch*/
-  for(i=0;i<size;i++){
+  for(programCounter=0;programCounter<size;programCounter++){
     instruction=(code[i]&0xFF000000)>>24;
 
     if(instruction==HALT){
