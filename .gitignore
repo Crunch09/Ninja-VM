@@ -1,2 +1,5 @@
 njvm
-/bin/
+bin/
+bin_linux/
+.njvm.c.swp
+njvm.c.orig
