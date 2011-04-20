@@ -30,6 +30,7 @@
 #define JMP 19 /* jmp <target> */
 #define BRF 20 /* brf <target> */
 #define BRT 21 /* brt <target> */
+#define PO 99
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
@@ -231,13 +232,13 @@ void program(unsigned int *code,int size){
              (instruction==GT) ||
              (instruction==GE)){
 
-	  n1=pop();
-	  n2=pop();
-	  /*printf("%d \n", compare(n1, n2, instruction));*/
-	  push(compare(n1, n2, instruction));
+      n1=pop();
+      n2=pop();
+      /*printf("%d \n", compare(n1, n2, instruction));*/
+      push(compare(n1, n2, instruction));
     }else if(instruction==JMP){
-	  programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
- 	  /*printf("%d\n", code[programCounter]);*/
+      programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+      /*printf("%d\n", code[programCounter]);*/
     }else if(instruction==BRF){
 	  n1=pop();
 	  if(n1 == 0){
@@ -259,6 +260,8 @@ void program(unsigned int *code,int size){
 		printf("Error in BRT. Stack element is neither 0 nor 1.");
 		exit(-99);	
 	  }
+    }else if(instruction==PO){
+      printf("Stackpointer: %d\nFramepointer: %d\n",stackPointer,framePointer);
     }
   }
 
