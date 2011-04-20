@@ -157,6 +157,8 @@ void printProgram(unsigned int *code, int size){
 	  printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==BRT){
 	  printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+    }else if(zeile==PO=){
+      printf("%03d: po\n",programCounter);
     }
 
     programCounter++;
