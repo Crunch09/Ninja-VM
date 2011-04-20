@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "njvm.h"
 
 #define HALT 0
@@ -10,6 +11,7 @@
 #define MUL 4
 #define DIV 5
 #define MOD 6
+
 #define RDINT 7
 #define WRINT 8
 
@@ -17,6 +19,17 @@
 #define RSF 10
 #define PUSHL 11 /*pushl <n>*/
 #define POPL 12 /*popl <n>*/
+
+#define EQ 13  /* == */
+#define NE 14  /* != */
+#define LT 15  /* <  */
+#define LE 16  /* <= */
+#define GT 17  /* >  */
+#define GE 18  /* >= */
+
+#define JMP 19 /* jmp <target> */
+#define BRF 20 /* brf <target> */
+#define BRT 21 /* brt <target> */
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
@@ -125,6 +138,24 @@ void printProgram(unsigned int *code, int size){
       printf("%03d: pushl %5d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==POPL){
       printf("%03d: popl %6d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+    }else if(zeile==EQ){
+	  printf("%03d: eq \n",programCounter);
+    }else if(zeile==NE){
+	  printf("%03d: ne \n",programCounter);
+    }else if(zeile==LT){
+	  printf("%03d: lt \n",programCounter);
+    }else if(zeile==LE){
+	  printf("%03d: le \n",programCounter);
+    }else if(zeile==GT){
+	  printf("%03d: gt \n",programCounter);
+    }else if(zeile==GE){
+	  printf("%03d: ge \n",programCounter);
+    }else if(zeile==JMP){
+	  printf("%03d: jmp %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+    }else if(zeile==BRF){
+	  printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+    }else if(zeile==BRT){
+	  printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }
 
     programCounter++;
@@ -193,12 +224,68 @@ void program(unsigned int *code,int size){
     }else if(instruction==POPL){ /*wert vom stack wird in frame geschrieben*/
       n1=pop();
       pushFrame(n1,code[programCounter]);
+    }else if((instruction==EQ) ||
+             (instruction==NE) ||
+             (instruction==LT) ||
+             (instruction==LE) ||
+             (instruction==GT) ||
+             (instruction==GE)){
+
+	  n1=pop();
+	  n2=pop();
+	  /*printf("%d \n", compare(n1, n2, instruction));*/
+	  push(compare(n1, n2, instruction));
+    }else if(instruction==JMP){
+	  programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+ 	  /*printf("%d\n", code[programCounter]);*/
+    }else if(instruction==BRF){
+	  n1=pop();
+	  if(n1 == 0){
+		programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+	  }else if(n1 == 1){
+	    /* nix */	
+	  }else{
+		printf("Error in BRF. Stack element is neither 0 nor 1.");
+		exit(-99);	
+	  }
+    }else if(instruction==BRT){
+	  n1=pop();
+	 /*printf("%d\n", n1);*/
+	  if(n1 == 1){
+		programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+	  }else if(n1 == 0){
+	    /* nix */	
+	  }else{
+		printf("Error in BRT. Stack element is neither 0 nor 1.");
+		exit(-99);	
+	  }
     }
   }
 
   stackPointer=0;
   framePointer=0;
   printf("Ninja Virtual Machine stopped\n");
+}
+
+/* Vergleicht zwei Zahlen */
+int compare(int n1, int n2, int instruction){
+  bool result = false;
+  switch(instruction) {
+	case EQ: result = (n1 == n2);
+	         break;
+    case NE: result = (n1 != n2);
+	         break;
+	case LT: result = (n1 < n2);
+	         break;
+	case LE: result = (n1 <= n2);
+			 break;
+	case GT: result = (n1 > n2);
+	         break;
+	case GE: result = (n1 >= n2);
+	         break;  
+  }
+
+  return (result) ? 1 : 0;
 }
 
 
