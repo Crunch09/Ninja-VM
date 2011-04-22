@@ -4,7 +4,7 @@
 
 
 int main(int argc, char *argv[]){
-  
+  pintf("Start tests\n\n");  
 
   system("./nja asm/test/halt_test.asm bin/test/halt_test.bin");
   system("./nja asm/test/add_test.asm bin/test/add_test.bin");
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
   system("./njvm brf_test.bin");
   system("./njvm brt_test.bin");
 
-  printf("Stopped tests\n");
+  printf("\n\nStopped tests\n");
 
   return 0;
 }
