@@ -140,23 +140,23 @@ void printProgram(unsigned int *code, int size){
     }else if(zeile==POPL){
       printf("%03d: popl %6d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==EQ){
-	  printf("%03d: eq \n",programCounter);
+      printf("%03d: eq \n",programCounter);
     }else if(zeile==NE){
-	  printf("%03d: ne \n",programCounter);
+      printf("%03d: ne \n",programCounter);
     }else if(zeile==LT){
-	  printf("%03d: lt \n",programCounter);
+      printf("%03d: lt \n",programCounter);
     }else if(zeile==LE){
-	  printf("%03d: le \n",programCounter);
+      printf("%03d: le \n",programCounter);
     }else if(zeile==GT){
-	  printf("%03d: gt \n",programCounter);
+      printf("%03d: gt \n",programCounter);
     }else if(zeile==GE){
-	  printf("%03d: ge \n",programCounter);
+      printf("%03d: ge \n",programCounter);
     }else if(zeile==JMP){
-	  printf("%03d: jmp %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+      printf("%03d: jmp %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==BRF){
-	  printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+      printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==BRT){
-	  printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
+      printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[i]&0x00FFFFFF)));
     }else if(zeile==PO){
       printf("%03d: po\n",programCounter);
     }
@@ -190,7 +190,7 @@ void program(unsigned int *code,int size){
     }else if(instruction==SUB){
       n1=pop();
       n2=pop();
-      push(n2-n1);
+      push(n1-n2);
     }else if(instruction==MUL){
       n1=pop();
       n2=pop();
@@ -242,15 +242,15 @@ void program(unsigned int *code,int size){
       programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
       /*printf("%d\n", code[programCounter]);*/
     }else if(instruction==BRF){
-	  n1=pop();
-	  if(n1 == 0){
-		programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
-	  }else if(n1 == 1){
-	    /* nix */	
-	  }else{
-		printf("Error in BRF. Stack element is neither 0 nor 1.");
-		exit(-99);	
-	  }
+      n1=pop();
+      if(n1 == 0){
+	programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+      }else if(n1 == 1){
+	/* nix */	
+      }else{
+	printf("Error in BRF. Stack element is neither 0 nor 1.");
+	exit(-99);	
+      }
     }else if(instruction==BRT){
 	  n1=pop();
 	 /*printf("%d\n", n1);*/

@@ -4,7 +4,7 @@
 
 
 int main(int argc, char *argv[]){
-  pintf("Start tests\n\n");  
+  printf("Start tests\n\n");  
 
   system("./nja asm/test/halt_test.asm bin/test/halt_test.bin");
   system("./nja asm/test/add_test.asm bin/test/add_test.bin");
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
   system("./njvm bin/test/div_test.bin");
   system("./njvm bin/test/mod_test.bin");
 
-  /*system("./njvm rdint_wrint_test.bin");*/
+  system("./njvm rdint_wrint_test.bin");
   system("./njvm asf_test.bin");
 
   system("./njvm eq_test.bin");
