@@ -30,6 +30,15 @@
 #define JMP 19 /* jmp <target> */
 #define BRF 20 /* brf <target> */
 #define BRT 21 /* brt <target> */
+
+#define CALL 22 /* call <target> */
+#define RET 23
+#define DROP 24 /* drop  <n> */
+#define PUSHR 25
+#define POPR 26
+
+#define DUP 27
+
 #define PO 99
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
@@ -229,6 +238,17 @@ void printProgram(unsigned int *code){
     printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==BRT){
     printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==CALL){
+    printf("%03d: call %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==RET){
+    printf("%03d: ret",programCounter);
+  }else if(zeile==DROP){
+  }else if(zeile==PUSHR){
+    printf("%03d: pushr",programCounter);
+  }else if(zeile==POPR){
+    printf("%03d: popr",programCounter);
+  }else if(zeile==DUP){
+    printf("%03d: dup",programCounter);
   }else if(zeile==PO){
     printf("%03d: po\n",programCounter);
   }
@@ -304,6 +324,10 @@ void program(unsigned int *code){
   }else if(instruction==BRF){
     n1=pop();
     if(n1 == 0){
+      if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
+	printf("Branch address out of range. Programm will be stoped.");
+	exit(-99);
+      }
       programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
     }else if(n1 == 1){
       /* nix */	
@@ -314,6 +338,10 @@ void program(unsigned int *code){
   }else if(instruction==BRT){
     n1=pop();
     if(n1 == 1){
+      if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
+	printf("Branch address out of range. Programm will be stoped.");
+	exit(-99);
+      }
       programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
     }else if(n1 == 0){
       /* nix */	
