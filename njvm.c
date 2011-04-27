@@ -46,7 +46,7 @@
 
 #define stackSize 1024
 
-const char version[] = "0.3";
+const char version[] = "0.3.1";
 int stack[stackSize];
 int stackPointer=0;
 int framePointer=0;
@@ -241,14 +241,15 @@ void printProgram(unsigned int *code){
   }else if(zeile==CALL){
     printf("%03d: call %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==RET){
-    printf("%03d: ret",programCounter);
+    printf("%03d: ret\n",programCounter);
   }else if(zeile==DROP){
+    printf("%03d: drop %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==PUSHR){
-    printf("%03d: pushr",programCounter);
+    printf("%03d: pushr\n",programCounter);
   }else if(zeile==POPR){
-    printf("%03d: popr",programCounter);
+    printf("%03d: popr\n",programCounter);
   }else if(zeile==DUP){
-    printf("%03d: dup",programCounter);
+    printf("%03d: dup\n",programCounter);
   }else if(zeile==PO){
     printf("%03d: po\n",programCounter);
   }
@@ -349,6 +350,19 @@ void program(unsigned int *code){
       printf("Error in BRT. Stack element is neither 0 nor 1.");
       exit(-99);	
     }
+  }else if(instruction==CALL){
+    push(programCounter);
+    programCounter=IMMEDIATE(code[programCounter])-1;
+  }else if(instruction==RET){
+    programCounter=pop();
+  }else if(instruction==DROP){
+    
+  }else if(instruction==PUSHR){
+    
+  }else if(instruction==POPR){
+    
+  }else if(instrsuction==DUP){
+    
   }else if(instruction==PO){
     printf("Stackpointer: %d\nFramepointer: %d\n",stackPointer,framePointer);
   }
@@ -359,18 +373,18 @@ void program(unsigned int *code){
 int compare(int n1, int n2, int instruction){
   bool result = false;
   switch(instruction) {
-	case EQ: result = (n1 == n2);
-	         break;
+    case EQ: result = (n1 == n2);
+      break;
     case NE: result = (n1 != n2);
-	         break;
-	case LT: result = (n1 < n2);
-	         break;
-	case LE: result = (n1 <= n2);
-			 break;
-	case GT: result = (n1 > n2);
-	         break;
-	case GE: result = (n1 >= n2);
-	         break;  
+      break;
+    case LT: result = (n1 < n2);
+      break;
+    case LE: result = (n1 <= n2);
+      break;
+    case GT: result = (n1 > n2);
+      break;
+    case GE: result = (n1 >= n2);
+      break;  
   }
 
   return (result) ? 1 : 0;
