@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]){
   printf("Start tests\n\n");  
 
-  system("./nja asm/test/halt_test.asm bin/test/halt_test.bin");
+  /*system("./nja asm/test/halt_test.asm bin/test/halt_test.bin");
   system("./nja asm/test/add_test.asm bin/test/add_test.bin");
   system("./nja asm/test/sub_test.asm bin/test/sub_test.bin");
   system("./nja asm/test/mul_test.asm bin/test/mul_test.bin");
@@ -43,8 +43,10 @@ int main(int argc, char *argv[]){
 
   system("./njvm jmp_test.bin");
   system("./njvm brf_test.bin");
-  system("./njvm brt_test.bin");
+  system("./njvm brt_test.bin");*/
 
+  system("./nja asm/test/sub.asm bin/test/sub.bin");
+  system("./njvm --debug bin/test/sub.bin");
   printf("\n\nStopped tests\n");
 
   return 0;

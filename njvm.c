@@ -17,8 +17,8 @@
 
 #define ASF 9 /*asf <n>*/
 #define RSF 10
-#define PUSHL 11 /*pushl <n>*/
-#define POPL 12 /*popl <n>*/
+#define PUSHL 11 /*pushl <n>, wert von frame in stack*/
+#define POPL 12 /*popl <n>, wert von stack in frame*/
 
 #define EQ 13  /* == */
 #define NE 14  /* != */
@@ -250,7 +250,7 @@ void program(unsigned int *code){
   }else if(instruction==SUB){
     n1=pop();
     n2=pop();
-    push(n1-n2);
+    push(n2-n1);
   }else if(instruction==MUL){
     n1=pop();
     n2=pop();
@@ -298,14 +298,13 @@ void program(unsigned int *code){
     n1=pop();
     n2=pop();
     /*printf("%d \n", compare(n1, n2, instruction));*/
-    push(compare(n1, n2, instruction));
+    push(compare(n2, n1, instruction));
   }else if(instruction==JMP){
-    programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
-    /*printf("%d\n", code[programCounter]);*/
+    programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
   }else if(instruction==BRF){
     n1=pop();
     if(n1 == 0){
-    programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+      programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
     }else if(n1 == 1){
       /* nix */	
     }else{
@@ -314,9 +313,8 @@ void program(unsigned int *code){
     }
   }else if(instruction==BRT){
     n1=pop();
-    /*printf("%d\n", n1);*/
     if(n1 == 1){
-      programCounter = IMMEDIATE(code[programCounter]); /* -1 wegen for-schleifen ++ */
+      programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
     }else if(n1 == 0){
       /* nix */	
     }else{
