@@ -398,10 +398,10 @@ int compare(int n1, int n2, int instruction){
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
   /*pruefen frame innerhalb des stacks*/
-  if(i < stackSize){
+  /*if(i < stackSize){
     printf("Frameposition out of Range. Program will be stopped.\n");
     exit(-99);
-  }
+  }*/
   stack[i]=num;
 }
 int popFrame(int point){
