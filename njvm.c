@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "njvm.h"
 
+/* begin instructions */
 #define HALT 0
 #define PUSHC 1 /*pushc <n>*/
 #define ADD 2 
@@ -38,8 +39,7 @@
 #define POPR 26
 
 #define DUP 27
-
-#define PO 99
+/* end instructions */
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
@@ -48,6 +48,7 @@
 
 const char version[] = "0.3.1";
 int stack[stackSize];
+int returnRegister;
 int stackPointer=0;
 int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
@@ -73,8 +74,8 @@ int main(int argc, char *argv[]){
 	closeFile();
 	break;
       }else{
-	printf("Ninja Virtual Machine started\n");
 	openFile(i,argc,argv);
+	printf("Ninja Virtual Machine started\n");
 	for(programCounter=0;programCounter<(fileSize/sizeof(programPointer[0]));programCounter++)
 	  program(programPointer);
 	closeFile();
@@ -183,8 +184,6 @@ void debug(void){
       printf("Command unknown, try again\n");
     }
   }
-
-  printf("Ninja Virtual Machine stopped\n");
 }
 
 
@@ -250,8 +249,6 @@ void printProgram(unsigned int *code){
     printf("%03d: popr\n",programCounter);
   }else if(zeile==DUP){
     printf("%03d: dup\n",programCounter);
-  }else if(zeile==PO){
-    printf("%03d: po\n",programCounter);
   }
 }
 
@@ -261,7 +258,8 @@ void program(unsigned int *code){
   instruction=(code[programCounter]&0xFF000000)>>24;
 
   if(instruction==HALT){
-    /*break;*/
+    printf("Ninja Virtual Machone stopped\n");
+    exit(0);
   }else if(instruction==PUSHC){ /*schreiben in stack*/
     push(code[programCounter]);
   }else if(instruction==ADD){
@@ -295,14 +293,15 @@ void program(unsigned int *code){
     push(eingeleseneZahl);
   }else if(instruction==WRINT){
     printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
+    pop();
   }else if(instruction==ASF){ /*stack frame anlegen, mit groesse n*/
-    push(framePointer);/*position des letzten frames wird gemerkt*/
-    push(IMMEDIATE(code[programCounter]));
+    push(framePointer); /*position des letzten frames wird gemerkt*/
+    /*push(IMMEDIATE(code[programCounter]));*/
     framePointer=stackPointer;
     stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
   }else if(instruction==RSF){ /*benutzen stack frame entfernen*/
     stackPointer=framePointer;
-    pop();
+    /*pop();*/
     framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
   }else if(instruction==PUSHL){ /*variable von frame wird in stack geschrieben*/
     n2=popFrame(code[programCounter]);
@@ -318,7 +317,6 @@ void program(unsigned int *code){
            (instruction==GE)){
     n1=pop();
     n2=pop();
-    /*printf("%d \n", compare(n1, n2, instruction));*/
     push(compare(n2, n1, instruction));
   }else if(instruction==JMP){
     programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
@@ -353,18 +351,23 @@ void program(unsigned int *code){
   }else if(instruction==CALL){
     push(programCounter);
     programCounter=IMMEDIATE(code[programCounter])-1;
-  }else if(instruction==RET){
+  }else if(instruction==RET){ 
     programCounter=pop();
   }else if(instruction==DROP){
-    
+    n1 = IMMEDIATE(code[programCounter]);
+    while(n1 > 0){
+      pop();
+      n1--;
+    }
   }else if(instruction==PUSHR){
-    
+    push(returnRegister);
   }else if(instruction==POPR){
-    
-  }else if(instrsuction==DUP){
-    
-  }else if(instruction==PO){
-    printf("Stackpointer: %d\nFramepointer: %d\n",stackPointer,framePointer);
+    returnRegister = pop();
+  }else if(instruction==DUP){
+    n1 = pop();
+    /*n2 = n1;*/
+    push(n1);
+    push(n1);
   }
 }
 
@@ -394,8 +397,8 @@ int compare(int n1, int n2, int instruction){
 /*push und pop funktionen fuer frame stack*/
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  /*pruefen das stack frame nicht auf stack l*/
-  if(i>=(framePointer+stack[framePointer-1])){
+  /*pruefen frame innerhalb des stacks*/
+  if(i < stackSize){
     printf("Frameposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
@@ -403,11 +406,11 @@ void pushFrame(int num, int point){
 }
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  /*pruefen das stack frame nicht auf stack l*/
-  if(i>=(framePointer+stack[framePointer-1])){
+  /*pruefen ob frame inhalt innerhalb des stacks*/
+  /*if(i > 0){
     printf("Frameposition out of Range. Program will be stopped.\n");
     exit(-99);
-  }
+  }*/
   return stack[i];
 }
 
