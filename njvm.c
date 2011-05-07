@@ -46,7 +46,7 @@
 
 #define stackSize 1024
 
-const char version[] = "0.3.1";
+const char version[] = "0.4.1";
 int stack[stackSize];
 int returnRegister;
 int stackPointer=0;
@@ -86,7 +86,8 @@ int main(int argc, char *argv[]){
     printf("No Arguments, try --help.\n");
   }
 
-   return 0;
+   return    printf("Ninja Virtual Machone stopped\n");
+    exit(0); 0;
 }
 
 
@@ -151,21 +152,22 @@ void debug(void){
 
     if(strcmp(inputString,"is")==0){
       for(j=stackPointer;j>-1;j--){ /* stack von oben nach unten durchgehen */
-	if(j==stackPointer && j==framePointer)
-	  printf("sp, fp ---> %04d: xxxx\n",j);
-	else if(j==stackPointer)
-	  printf("sp -------> %04d: xxxx\n",j);
-	else if(j==framePointer)
-	  printf("fp -------> %04d: %4d\n",j,stack[j]);
-	else
-	  printf("            %04d: %4d\n",j,stack[j]);
+	      if(j==stackPointer && j==framePointer)
+	        printf("sp, fp ---> %04d: xxxx\n",j);
+	      else if(j==stackPointer)
+	        printf("sp -------> %04d: xxxx\n",j);
+	      else if(j==framePointer)
+	        printf("fp -------> %04d: %4d\n",j,stack[j]);
+	      else
+	        printf("            %04d: %4d\n",j,stack[j]);
       }
       printf("--- bottom of stack ---\n");
       printProgram(programPointer);
     }else if(strcmp(inputString,"l")==0){
       tempInstruction=programCounter; /* temporaere speicherung programCounter  */
-      for(programCounter=0;programCounter<numberInstructions;programCounter++)
-	printProgram(programPointer);
+      for(programCounter=0;programCounter<numberInstructions;programCounter++){
+	      printProgram(programPointer);
+      }
 
       printf("--- end of code ---\n");
       programCounter=tempInstruction;
@@ -175,8 +177,9 @@ void debug(void){
       programCounter++;
       printProgram(programPointer);
     }else if(strcmp(inputString,"r")==0){ /* program laeuft normal ab */
-      for(;programCounter<numberInstructions;programCounter++)
+      for(;programCounter<numberInstructions;programCounter++){
         program(programPointer);
+      }
       break;
     }else if(strcmp(inputString,"q")==0){ /* beenden des debugers */
       break;
@@ -257,117 +260,157 @@ void program(unsigned int *code){
   int instruction, n1, n2, eingeleseneZahl;
   instruction=(code[programCounter]&0xFF000000)>>24;
 
-  if(instruction==HALT){
-    printf("Ninja Virtual Machone stopped\n");
-    exit(0);
-  }else if(instruction==PUSHC){ /*schreiben in stack*/
-    push(code[programCounter]);
-  }else if(instruction==ADD){
-    n1=pop();
-    n2=pop();
-    push(n1+n2);
-  }else if(instruction==SUB){
-    n1=pop();
-    n2=pop();
-    push(n2-n1);
-  }else if(instruction==MUL){
-    n1=pop();
-    n2=pop();
-    push(n1*n2);
-  }else if(instruction==DIV){
-    n1=pop();
-    n2=pop();
+  switch(instruction){
+    case HALT:
+      printf("Ninja Virtual Machone stopped\n");
+      exit(0);
+    case PUSHC:
+      push(code[programCounter]);
+      break;
+    case ADD:
+      n1=pop();
+      n2=pop();
+      push(n1+n2);
+      break;
+    case SUB:
+      n1=pop();
+      n2=pop();
+      push(n2-n1);
+      break;
+    case MUL:
+      n1=pop();
+      n2=pop();
+      push(n1*n2);
+      break;
+    case DIV:
+      n1=pop();
+      n2=pop();
     
-    if(n2!=0){
-      push(n1/n2);
-    }else{
-
-    }
-  }else if(instruction==MOD){
-    n1=pop();
-    n2=pop();
-    push(n1%n2);
-  }else if(instruction==RDINT){
-    /* liest Zahl auf der konsole ein */
-    scanf("%d", &eingeleseneZahl);
-    push(eingeleseneZahl);
-  }else if(instruction==WRINT){
-    printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
-    pop();
-  }else if(instruction==ASF){ /*stack frame anlegen, mit groesse n*/
-    push(framePointer); /*position des letzten frames wird gemerkt*/
-    /*push(IMMEDIATE(code[programCounter]));*/
-    framePointer=stackPointer;
-    stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
-  }else if(instruction==RSF){ /*benutzen stack frame entfernen*/
-    stackPointer=framePointer;
-    /*pop();*/
-    framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
-  }else if(instruction==PUSHL){ /*variable von frame wird in stack geschrieben*/
-    n2=popFrame(code[programCounter]);
-    push(n2);
-  }else if(instruction==POPL){ /*wert vom stack wird in frame geschrieben*/
-    n1=pop();
-    pushFrame(n1,code[programCounter]);
-  }else if((instruction==EQ) ||
-           (instruction==NE) ||
-           (instruction==LT) ||
-           (instruction==LE) ||
-           (instruction==GT) ||
-           (instruction==GE)){
-    n1=pop();
-    n2=pop();
-    push(compare(n2, n1, instruction));
-  }else if(instruction==JMP){
-    programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
-  }else if(instruction==BRF){
-    n1=pop();
-    if(n1 == 0){
-      if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
-	printf("Branch address out of range. Programm will be stoped.");
-	exit(-99);
+      if(n2!=0){
+        push(n1/n2);
+      }else{
+        printf("Division by Zero not possible. Programm will be stopped.\n");
+        exit(-99);
       }
-      programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
-    }else if(n1 == 1){
-      /* nix */	
-    }else{
-      printf("Error in BRF. Stack element is neither 0 nor 1.");
-      exit(-99);	
-    }
-  }else if(instruction==BRT){
-    n1=pop();
-    if(n1 == 1){
-      if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
-	printf("Branch address out of range. Programm will be stoped.");
-	exit(-99);
-      }
-      programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
-    }else if(n1 == 0){
-      /* nix */	
-    }else{
-      printf("Error in BRT. Stack element is neither 0 nor 1.");
-      exit(-99);	
-    }
-  }else if(instruction==CALL){
-    push(programCounter);
-    programCounter=IMMEDIATE(code[programCounter])-1;
-  }else if(instruction==RET){ 
-    programCounter=pop();
-  }else if(instruction==DROP){
-    n1 = IMMEDIATE(code[programCounter]);
-    while(n1 > 0){
+      break;
+    case MOD:
+      n1=pop();
+      n2=pop();
+      push(n1%n2);
+      break;
+    case RDINT: /* liest Zahl auf der konsole ein */
+      scanf("%d", &eingeleseneZahl);
+      push(eingeleseneZahl);
+      break;
+    case WRINT:
+      printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
       pop();
-      n1--;
-    }
-  }else if(instruction==PUSHR){
-    push(returnRegister);
-  }else if(instruction==POPR){
-    returnRegister = pop();
-  }else if(instruction==DUP){
-    n1 = pop();
-    /*n2 = n1;*/
-    push(n1);
-    push(n1);
+      break;
+    case ASF: /*stack frame anlegen, mit groesse n*/
+      push(framePointer); /*position des letzten frames wird gemerkt*/
+      framePointer=stackPointer;
+      stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
+      break;
+    case RSF: /*benutzen stack frame entfernen*/
+      stackPointer=framePointer;
+      framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
+      break;
+    case PUSHL: /*variable von frame wird in stack geschrieben*/
+      n1=popFrame(code[programCounter]);
+      push(n1);
+      break;
+    case POPL: /*wert vom stack wird in frame geschrieben*/
+      n1=pop();
+      pushFrame(n1,code[programCounter]);
+      break;
+    case EQ:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case NE:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case LT:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case LE:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case GT:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case GE:
+      n1=pop();
+      n2=pop();
+      push(compare(n2, n1, instruction));
+      break;
+    case JMP:
+      programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
+      break;
+    case BRF:
+      n1=pop();
+      if(n1 == 0){
+        if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
+        	printf("Branch address out of range. Programm will be stoped.");
+        	exit(-99);
+        }
+        programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
+      }else if(n1 == 1){
+      /* nix */	
+      }else{
+        printf("Error in BRF. Stack element is neither 0 nor 1.");
+        exit(-99);	
+      }
+      break;
+    case BRT:
+      n1=pop();
+      if(n1 == 1){
+        if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
+	        printf("Branch address out of range. Programm will be stoped.");
+        	exit(-99);
+        }
+        programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
+      }else if(n1 == 0){
+        /* nix */	
+      }else{
+        printf("Error in BRT. Stack element is neither 0 nor 1.");
+        exit(-99);	
+      }
+      break;
+    case CALL:
+      push(programCounter); /* programCounter wird zwischen gespeichert, fuer spaetere ruecksprung */
+      programCounter=IMMEDIATE(code[programCounter])-1;
+      break;
+    case RET:
+      programCounter=pop();
+      break;
+    case DROP: /* loescht n Werte aus dem Stack */
+      n1 = IMMEDIATE(code[programCounter]);
+      while(n1 > 0){
+        pop();
+        n1--;
+      }
+      break;
+    case PUSHR: /* holt Wert aus returnRegister */
+      push(returnRegister);
+      break;
+    case POPR: /* speichert Wert in returnRegister */
+      returnRegister = pop();
+      break;
+    case DUP: /* dupliziert obersten Wert in dem Stack */
+      n1 = pop();
+      /*n2 = n1;*/
+      push(n1);
+      push(n1);
   }
 }
 
