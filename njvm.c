@@ -361,7 +361,7 @@ void program(unsigned int *code){
     
   }else if(instruction==POPR){
     
-  }else if(instruction==DUP){
+  }else if(instrsuction==DUP){
     
   }else if(instruction==PO){
     printf("Stackpointer: %d\nFramepointer: %d\n",stackPointer,framePointer);
