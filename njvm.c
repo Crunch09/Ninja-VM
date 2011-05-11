@@ -86,8 +86,8 @@ int main(int argc, char *argv[]){
     printf("No Arguments, try --help.\n");
   }
 
-   return    printf("Ninja Virtual Machone stopped\n");
-    exit(0); 0;
+   return    printf("Ninja Virtual Machine stopped\n");
+    exit(0);
 }
 
 
@@ -262,7 +262,7 @@ void program(unsigned int *code){
 
   switch(instruction){
     case HALT: /* beendet das Programm */
-      printf("Ninja Virtual Machone stopped\n");
+      printf("Ninja Virtual Machine stopped\n");
       exit(0);
     case PUSHC:
       push(code[programCounter]);
@@ -440,20 +440,10 @@ int compare(int n1, int n2, int instruction){
 /*push und pop funktionen fuer frame stack*/
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  /*pruefen frame innerhalb des stacks*/
-  /*if(i < stackSize){
-    printf("Frameposition out of Range. Program will be stopped.\n");
-    exit(-99);
-  }*/
   stack[i]=num;
 }
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  /*pruefen ob frame inhalt innerhalb des stacks*/
-  /*if(i > 0){
-    printf("Frameposition out of Range. Program will be stopped.\n");
-    exit(-99);
-  }*/
   return stack[i];
 }
 
