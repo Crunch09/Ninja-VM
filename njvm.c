@@ -46,7 +46,7 @@
 
 #define stackSize 1024
 
-const char version[] = "0.3.1";
+const char version[] = "0.4.1";
 int stack[stackSize];
 int stackPointer=0;
 int framePointer=0;
