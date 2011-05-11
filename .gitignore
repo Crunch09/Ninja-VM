@@ -6,3 +6,4 @@ bin_linux/
 njvm.c.orig
 test_njvm.c
 *.bin
+tests/
