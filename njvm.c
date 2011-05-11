@@ -259,25 +259,32 @@ void program(unsigned int *code){
   int instruction, n1, n2, eingeleseneZahl;
   instruction=(code[programCounter]&0xFF000000)>>24;
 
-  if(instruction==HALT){
-    /*break;*/
-  }else if(instruction==PUSHC){ /*schreiben in stack*/
-    push(code[programCounter]);
-  }else if(instruction==ADD){
-    n1=pop();
-    n2=pop();
-    push(n1+n2);
-  }else if(instruction==SUB){
-    n1=pop();
-    n2=pop();
-    push(n2-n1);
-  }else if(instruction==MUL){
-    n1=pop();
-    n2=pop();
-    push(n1*n2);
-  }else if(instruction==DIV){
-    n1=pop();
-    n2=pop();
+  switch(instruction){
+    case HALT: /* beendet das Programm */
+      printf("Ninja Virtual Machone stopped\n");
+      exit(0);
+    case PUSHC:
+      push(code[programCounter]);
+      break;
+    case ADD:
+      n1=pop();
+      n2=pop();
+      push(n1+n2);
+      break;
+    case SUB:
+      n1=pop();
+      n2=pop();
+      push(n2-n1);
+      break;
+    case MUL:
+      n1=pop();
+      n2=pop();
+      push(n1*n2);
+      break;
+    case DIV:
+      n1=pop();
+      n2=pop();
+>>>>>>> 0.4.1
     
     if(n2!=0){
       push(n1/n2);
