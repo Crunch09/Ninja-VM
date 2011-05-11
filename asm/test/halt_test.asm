@@ -1,2 +1,0 @@
-// Testet halt
-halt
