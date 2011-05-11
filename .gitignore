@@ -1,8 +1,4 @@
 njvm
-asm/
 bin/
-bin_linux/
 .njvm.c.swp
 njvm.c.orig
-test_njvm.c
-*.bin
