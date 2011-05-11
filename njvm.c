@@ -39,7 +39,6 @@
 
 #define DUP 27
 
-#define PO 99
 
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
