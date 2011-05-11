@@ -1,0 +1,17 @@
+void main() {
+  local integer x;
+  local integer y;
+
+  x = read();
+  y = read();
+
+  write(abfrage(x,y));    
+}
+
+boolean abfrage(integer x, integer y){
+  if(x<y){
+    return(true);
+  }else{
+    return(false);
+  }
+}

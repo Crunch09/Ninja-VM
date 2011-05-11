@@ -1,0 +1,16 @@
+void main() {
+  local integer x;
+  local integer y;
+
+  x = read();
+  y = read();
+
+  if(x<y){
+    write(x);
+  }
+  if(y<x){
+    write(y);
+  }else{
+    write("x==y");
+  }    
+}

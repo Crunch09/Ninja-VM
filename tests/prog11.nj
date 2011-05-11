@@ -1,0 +1,17 @@
+//
+// compute the factorial of a number recursively
+//
+
+void main() {
+  local integer n;
+  n = read();
+  write(factorial(n));
+}
+
+integer factorial(integer n) {
+  if (n == 0) {
+    return 1;
+  } else {
+    return n * factorial(n - 1);
+  }
+}
