@@ -261,7 +261,7 @@ void program(unsigned int *code){
   instruction=(code[programCounter]&0xFF000000)>>24;
 
   switch(instruction){
-    case HALT:
+    case HALT: /* beendet das Programm */
       printf("Ninja Virtual Machone stopped\n");
       exit(0);
     case PUSHC:
