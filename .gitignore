@@ -1,5 +1,4 @@
 njvm
-asm/
 bin/
 bin_linux/
 .njvm.c.swp
