@@ -166,7 +166,13 @@ void debug(void){
     }else if(strcmp(inputString,"l")==0){
       tempInstruction=programCounter; /* temporaere speicherung programCounter  */
       for(programCounter=0;programCounter<numberInstructions;programCounter++){
-	      printProgram(programPointer);
+          if(programCounter == tempInstruction){
+            printf("\033[31m");
+            printProgram(programPointer);
+            printf("\033[0m"); 
+          }else{
+	       printProgram(programPointer);
+	      }
       }
 
       printf("--- end of code ---\n");

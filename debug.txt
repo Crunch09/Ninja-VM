@@ -1,0 +1,19 @@
+Die Optionen des Debuggers:
+
+- inspect Stack (is)
+
+ Zeigt den Stackinhalt mit framepointer (fp) und stackpointer (sp) an.
+ 
+- list (l)
+ 
+ Zeigt den Quelltext des Programms an. Die aktuelle Anweisung wird rot dargestellt.
+ 
+- step (s)
+ 
+ Zeigt die nächste Anweisung an und führt sie aus.
+ 
+- run (r)
+ Lässt das Programm laufen
+ 
+- quit (q)
+ Beendet den Debugger
