@@ -1,4 +1,6 @@
 njvm
+njvm.o
+njvm-linux
 bin/
 .njvm.c.swp
 njvm.c.orig

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Bitte entsprechend anpassen
+gcc -g -Wall -ansi -pedantic -o njvm njvm.c
+
