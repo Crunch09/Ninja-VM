@@ -291,8 +291,8 @@ void program(unsigned int *code){
       n1=pop();
       n2=pop();
     
-      if(n2!=0){
-        push(n1/n2);
+      if(n1!=0){
+        push(n2/n1);
       }else{
         printf("Division by Zero not possible. Programm will be stopped.\n");
         exit(-99);
@@ -301,7 +301,13 @@ void program(unsigned int *code){
     case MOD:
       n1=pop();
       n2=pop();
-      push(n1%n2);
+      
+	  if(n1!=0){
+		push(n2%n1);
+	  }else{
+		printf("Modulo by Zero not possible. Programm will be stopped.\n");
+        exit(-99);
+      }
       break;
     case RDINT: /* liest Zahl auf der konsole ein */
       scanf("%d", &eingeleseneZahl);
