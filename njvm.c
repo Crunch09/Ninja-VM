@@ -370,8 +370,8 @@ void program(unsigned int *code){
     case BRF:
       n1=pop();
       if(n1 == 0){
-        if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
-        	printf("Branch address out of range. Programm will be stoped.");
+        if(numberOfCommands<(IMMEDIATE(code[programCounter]))){
+        	printf("Branch address out of range. Programm will be stopped.");
         	exit(-99);
         }
         programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
@@ -385,8 +385,8 @@ void program(unsigned int *code){
     case BRT:
       n1=pop();
       if(n1 == 1){
-        if(numberOfCommands<(IMMEDIATE(code[programCounter])-1)){
-	        printf("Branch address out of range. Programm will be stoped.");
+        if(numberOfCommands<(IMMEDIATE(code[programCounter]))){
+	        printf("Branch address out of range. Programm will be stopped.");
         	exit(-99);
         }
         programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
