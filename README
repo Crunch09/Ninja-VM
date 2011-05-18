@@ -1,10 +1,10 @@
 ######## Ninja VM ########
 
-Installation
+Installation / Kompilieren
 ------------
 
 cd /path/to/Ninja/VM
-gcc -Wall -ansi -pedantic -o njvm njvm.c
+make
 
 
 Ausfuehren
