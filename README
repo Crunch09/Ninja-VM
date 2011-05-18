@@ -1,0 +1,30 @@
+######## Ninja VM ########
+
+Installation
+------------
+
+cd /path/to/Ninja/VM
+gcc -Wall -ansi -pedantic -o njvm njvm.c
+
+
+Ausfuehren
+----------
+
+./njvm path/to/filename.bin
+
+Fuehrt eine kompilierte Ninja-Datei aus.
+
+
+Debugger
+--------
+
+./njvm --debug path/to/filename.bin
+
+Startet den Debugger. Die Beschreibun des Debuggers
+entnehmen Sie bitte der Datei debug.txt.
+
+Copyright
+---------
+Hermann Sutter, Matr.Nr.   897886
+Florian Thomas, Matrin.Nr. 896858
+

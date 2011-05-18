@@ -84,10 +84,10 @@ int main(int argc, char *argv[]){
     }    
   }else{
     printf("No Arguments, try --help.\n");
+    exit(0);
   }
 
-   return    printf("Ninja Virtual Machine stopped\n");
-    exit(0);
+   return  0;
 }
 
 
@@ -97,7 +97,6 @@ void openFile(int i,int argc, char *argv[]){
   if(codeFile == NULL || (strstr(argv[i], ".bin") == NULL )){
     printf("Couldn't open %s . You need to use a .bin file. Try again. \n", argv[i]);
   }else{
-    printf("Opened %s successful. \n", argv[i]);
     /* Zeiger ans Ende setzen, um Größe zu ermitteln */
     fseek(codeFile, 0, SEEK_END);
     fileSize = ftell(codeFile);
@@ -108,7 +107,7 @@ void openFile(int i,int argc, char *argv[]){
       printf("No RAM available. \n");
       exit(-99);
     }
-    printf("Size: %d Bytes \n\n", fileSize);
+    /*printf("Size: %d Bytes \n\n", fileSize);*/
     numberOfCommands = fread(programPointer, 4, fileSize/4, codeFile);
     if(numberOfCommands < fileSize/sizeof(programPointer[0])){
       printf("There occured an error reading the file.  \n");
