@@ -263,7 +263,7 @@ void printProgram(unsigned int *code){
 /* ausfuehren der Instruktionen */
 void program(unsigned int *code){
   int instruction, eingeleseneZahl;
-  int n1, n2;
+  unsigned int n1, n2;
   instruction=(code[programCounter]&0xFF000000)>>24;
 
   switch(instruction){
@@ -461,7 +461,7 @@ int popFrame(int point){
 
 
 void push(int num){
-  stack[stackPointer]=SIGN_EXTEND(IMMEDIATE(num));/*(num&0x00FFFFFF);*/
+  stack[stackPointer]=IMMEDIATE(num);/*(num&0x00FFFFFF);*/
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){
