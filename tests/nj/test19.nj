@@ -1,0 +1,18 @@
+//
+// if statement
+//
+
+void f(boolean b) {
+  local integer a1;
+  local integer a2;
+  if (b) {
+    a1 = 2;
+    a2 = 22;
+  } else {
+    a1 = 3;
+    a2 = 33;
+  }
+}
+
+void main() {
+}

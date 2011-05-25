@@ -1,0 +1,15 @@
+//
+// if statement, dangling else
+//
+
+void f(boolean b, boolean c) {
+  local integer a;
+  if (b)
+    if (c)
+      a = 2;
+  else
+    a = 3;
+}
+
+void main() {
+}

@@ -1,0 +1,19 @@
+//
+// arithmetic expressions
+//
+
+integer f(integer a, integer b) {
+  local integer r;
+  r = a + b;
+  r = r * r;
+  r = r - a;
+  r = 1000 / r;
+  r = r % 13;
+  r = +r;
+  r = -r;
+  r = 3 - 2 * (r - 5);
+  return r;
+}
+
+void main() {
+}

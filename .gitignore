@@ -6,6 +6,10 @@ bin/
 njvm.c.orig
 test_njvm.c
 *.bin
-tests/
+tests/nja
+tests/njc
+tests/bin/*.bin
 hstr63/
 hstr63.tar.gz
+njc
+nja

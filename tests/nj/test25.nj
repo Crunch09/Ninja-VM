@@ -1,0 +1,10 @@
+//
+// call, no args, no return value
+//
+
+void main() {
+  f();
+}
+
+void f() {
+}

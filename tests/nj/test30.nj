@@ -1,0 +1,29 @@
+//
+// logical expressions
+//
+
+integer f(integer a, integer b) {
+  local integer r;
+  if (a < b && b > 17) {
+    r = 2;
+  }
+  if (a < b || b > 17) {
+    r = 3;
+  }
+  if (!(a < b && b > 17)) {
+    r = 2;
+  }
+  if (!(a < b) || !(b > 17)) {
+    r = 3;
+  }
+  return r;
+}
+
+boolean g(boolean x) {
+  x = x && true;
+  x = x || false;
+  return !x;
+}
+
+void main() {
+}

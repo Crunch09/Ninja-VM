@@ -1,0 +1,19 @@
+//
+// compute the factorial of a number iteratively
+//
+
+void main() {
+  local integer n;
+  n = read();
+  write(factorial(n));
+}
+
+integer factorial(integer n) {
+  local integer r;
+  r = 1;
+  while (n > 0) {
+    r = r * n;
+    n = n - 1;
+  }
+  return r;
+}

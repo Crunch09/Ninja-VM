@@ -1,0 +1,29 @@
+//
+// relational expressions
+//
+
+integer f(integer a, integer b) {
+  local integer r;
+  if (a == b) {
+    r = 2;
+  }
+  if (a != b) {
+    r = 3;
+  }
+  if (a < b) {
+    r = 4;
+  }
+  if (a <= b) {
+    r = 5;
+  }
+  if (a > b) {
+    r = 6;
+  }
+  if (a >= b) {
+    r = 7;
+  }
+  return r;
+}
+
+void main() {
+}

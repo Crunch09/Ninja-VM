@@ -1,0 +1,15 @@
+//
+// check variable offsets
+//
+
+integer f(integer x, integer y, integer z) {
+  local integer v;
+  local integer w;
+  v = 3;
+  w = 5;
+  return x + y + z + v + w;
+}
+
+void main() {
+  write(f(1, 2, 3));
+}

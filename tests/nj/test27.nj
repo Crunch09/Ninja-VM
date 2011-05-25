@@ -1,0 +1,12 @@
+//
+// call, no args, but a return value
+//
+
+void main() {
+  local integer a;
+  a = f();
+}
+
+integer f() {
+  return 42;
+}

@@ -1,0 +1,10 @@
+//
+// function declaration, one local variable
+//
+
+integer f() {
+  local boolean b;
+}
+
+void main() {
+}

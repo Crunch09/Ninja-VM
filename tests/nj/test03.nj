@@ -1,0 +1,12 @@
+//
+// three function declarations, different return types, no parameters
+//
+
+void main() {
+}
+
+integer f() {
+}
+
+boolean g() {
+}

@@ -1,0 +1,10 @@
+//
+// call, with args, but no return value
+//
+
+void main() {
+  f(1, 2, 3);
+}
+
+void f(integer a, integer b, integer c) {
+}

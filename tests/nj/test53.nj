@@ -1,0 +1,6 @@
+void main(){
+  local integer a;
+  a = 8388607;
+
+  write(a);
+}

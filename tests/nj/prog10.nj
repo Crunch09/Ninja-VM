@@ -1,0 +1,18 @@
+//
+// compute the ggt of two positive numbers
+//
+
+void main() {
+  local integer x;
+  local integer y;
+  x = read();
+  y = read();
+  while (x != y) {
+    if (x > y) {
+      x = x - y;
+    } else {
+      y = y - x;
+    }
+  }
+  write(x);
+}

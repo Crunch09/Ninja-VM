@@ -1,0 +1,9 @@
+//
+// function declaration, one parameter
+//
+
+integer f(integer a) {
+}
+
+void main() {
+}

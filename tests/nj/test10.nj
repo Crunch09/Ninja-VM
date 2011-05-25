@@ -1,0 +1,7 @@
+//
+// empty statement
+//
+
+void main() {
+  ;
+}

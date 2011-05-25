@@ -1,0 +1,20 @@
+//
+// nested calls, with args, and a return value
+//
+
+void main() {
+  local integer a;
+  a = f(g(1), g(2), g(3));
+}
+
+integer f(integer a, integer b, integer c) {
+  return h(a + b + c);
+}
+
+integer g(integer x) {
+  return x + 1;
+}
+
+integer h(integer y) {
+  return 2 * y;
+}

@@ -461,7 +461,7 @@ int popFrame(int point){
 
 
 void push(int num){
-  stack[stackPointer]=IMMEDIATE(num);/*(num&0x00FFFFFF);*/
+  stack[stackPointer]=num;/*(num&0x00FFFFFF);*/
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){

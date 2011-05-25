@@ -1,0 +1,7 @@
+//
+// read and write an integer
+//
+
+void main() {
+  write(read());
+}
