@@ -1,0 +1,11 @@
+void printHelp(void);
+void program(unsigned int *code);
+void printProgram(unsigned int *code);
+void push(int num);
+int pop(void);
+void pushFrame(int num, int point);
+int popFrame(int point);
+int compare(int n1, int n2, int instruction);
+void openFile(int i, int argc, char *argv[]);
+void closeFile(void);
+void debug(void);
