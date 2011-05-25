@@ -1,8 +1,5 @@
-L1:
-L2:
-pushc 3
-rdint
-brf L1
-L3:
+pushc 64000
+pushc 128000
+add
 wrint
 halt
