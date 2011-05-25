@@ -271,7 +271,7 @@ void program(unsigned int *code){
       printf("Ninja Virtual Machine stopped\n");
       exit(0);
     case PUSHC:
-      push(code[programCounter]);
+      push(SIGN_EXTEND(code[programCounter]&0x00FFFFFF));
       break;
     case ADD:
       n1=pop();
@@ -315,7 +315,7 @@ void program(unsigned int *code){
       push(eingeleseneZahl);
       break;
     case WRINT:
-      printf("%d\n",SIGN_EXTEND(IMMEDIATE(stack[stackPointer-1])));
+      printf("%d\n",stack[stackPointer-1]);
       pop();
       break;
     case ASF: /*stack frame anlegen, mit groesse n*/
