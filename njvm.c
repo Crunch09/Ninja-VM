@@ -1,6 +1,7 @@
 /* Ninja Virtual Machine */
 
-const char version[] = "0.4.1";
+const char version[] = "0.5";
+
 int stack[stackSize];
 int returnRegister;
 int stackPointer=0;
