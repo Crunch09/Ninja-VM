@@ -262,8 +262,7 @@ void printProgram(unsigned int *code){
 
 /* ausfuehren der Instruktionen */
 void program(unsigned int *code){
-  int instruction, eingeleseneZahl;
-  int n1, n2;
+  int instruction, n1, n2, eingeleseneZahl;
   instruction=(code[programCounter]&0xFF000000)>>24;
 
   switch(instruction){
