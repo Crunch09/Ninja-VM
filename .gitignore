@@ -7,3 +7,5 @@ njvm.c.orig
 test_njvm.c
 *.bin
 tests/
+hstr63/
+hstr63.tar.gz
