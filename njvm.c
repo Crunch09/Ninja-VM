@@ -1,8 +1,18 @@
 /* Ninja Virtual Machine */
 
+/* include libs */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include "njvm.h"
+
+
 const char version[] = "0.5";
 
-int stack[stackSize];
+/*int stack[stackSize];*/
+StackItem stack[stackSize];
+
 int returnRegister;
 int stackPointer=0;
 int framePointer=0;
@@ -111,9 +121,9 @@ void debug(void){
 	      else if(j==stackPointer)
 	        printf("sp -------> %04d: xxxx\n",j);
 	      else if(j==framePointer)
-	        printf("fp -------> %04d: %4d\n",j,stack[j]);
+	        printf("fp -------> %04d: %4d\n",j,getStackVal(j));
 	      else
-	        printf("            %04d: %4d\n",j,stack[j]);
+	        printf("            %04d: %4d\n",j,getStackVal(j));
       }
       printf("--- bottom of stack ---\n");
       printProgram(programPointer);
@@ -226,29 +236,29 @@ void program(unsigned int *code){
       printf("Ninja Virtual Machine stopped\n");
       exit(0);
     case PUSHC:
-      push(SIGN_EXTEND(code[programCounter]&0x00FFFFFF));
+      push(SIGN_EXTEND(code[programCounter]&0x00FFFFFF), false);
       break;
     case ADD:
       n1=pop();
       n2=pop();
-      push(n1+n2);
+      push(n1+n2, false);
       break;
     case SUB:
       n1=pop();
       n2=pop();
-      push(n2-n1);
+      push(n2-n1, false);
       break;
     case MUL:
       n1=pop();
       n2=pop();
-      push(n1*n2);
+      push(n1*n2, false);
       break;
     case DIV:
       n1=pop();
       n2=pop();
     
       if(n1!=0){
-        push(n2/n1);
+        push(n2/n1, false);
       }else{
         printf("Division by Zero not possible. Programm will be stopped.\n");
         exit(-99);
@@ -259,7 +269,7 @@ void program(unsigned int *code){
       n2=pop();
       
 	  if(n1!=0){
-		push(n2%n1);
+		push(n2%n1, false);
 	  }else{
 		printf("Modulo by Zero not possible. Programm will be stopped.\n");
         exit(-99);
@@ -267,14 +277,14 @@ void program(unsigned int *code){
       break;
     case RDINT: /* liest Zahl auf der konsole ein */
       scanf("%d", &eingeleseneZahl);
-      push(eingeleseneZahl);
+      push(eingeleseneZahl, false);
       break;
     case WRINT:
-      printf("%d\n",stack[stackPointer-1]);
+      printf("%d\n",getStackVal(stackPointer-1));/*stack[stackPointer-1]);*/
       pop();
       break;
     case ASF: /*stack frame anlegen, mit groesse n*/
-      push(framePointer); /*position des letzten frames wird gemerkt*/
+      push(framePointer, true); /*position des letzten frames wird gemerkt*/
       framePointer=stackPointer;
       stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
       break;
@@ -284,7 +294,7 @@ void program(unsigned int *code){
       break;
     case PUSHL: /*variable von frame wird in stack geschrieben*/
       n1=popFrame(code[programCounter]);
-      push(n1);
+      push(n1, false);
       break;
     case POPL: /*wert vom stack wird in frame geschrieben*/
       n1=pop();
@@ -293,32 +303,32 @@ void program(unsigned int *code){
     case EQ:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case NE:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case LT:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case LE:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case GT:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case GE:
       n1=pop();
       n2=pop();
-      push(compare(n2, n1, instruction));
+      push(compare(n2, n1, instruction), false);
       break;
     case JMP:
       programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
@@ -354,7 +364,7 @@ void program(unsigned int *code){
       }
       break;
     case CALL:
-      push(programCounter); /* programCounter wird zwischen gespeichert, fuer spaetere ruecksprung */
+      push(programCounter, true); /* programCounter wird zwischen gespeichert, fuer spaetere ruecksprung */
       programCounter=IMMEDIATE(code[programCounter])-1;
       break;
     case RET:
@@ -368,7 +378,7 @@ void program(unsigned int *code){
       }
       break;
     case PUSHR: /* holt Wert aus returnRegister */
-      push(returnRegister);
+      push(returnRegister, false);
       break;
     case POPR: /* speichert Wert in returnRegister */
       returnRegister = pop();
@@ -376,8 +386,8 @@ void program(unsigned int *code){
     case DUP: /* dupliziert obersten Wert in dem Stack */
       n1 = pop();
       /*n2 = n1;*/
-      push(n1);
-      push(n1);
+      push(n1, false);
+      push(n1, false);
   }
 }
 
@@ -407,16 +417,29 @@ int compare(int n1, int n2, int instruction){
 /*push und pop funktionen fuer frame stack*/
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  stack[i]=num;
+  newStackVal(i, num, true);
 }
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  return stack[i];
+  return getStackVal(i);
 }
 
 
-void push(int num){
-  stack[stackPointer]=num;/*(num&0x00FFFFFF);*/
+void push(int num, bool isNumber){
+  /*StackItem[stackPointer] =  malloc(sizeof(StackItem));*/
+  newStackVal(stackPointer, num, isNumber);
+
+  /*if(isNumber==true){
+    temp.isNumber = true;
+    temp.u->number = num;
+    stack[stackPointer] = temp;
+  }else{
+    temp.isNumber = false;
+    temp.u->objRef = malloc(sizeof(StackItem));
+    temp.u->objRef.isNumber = true;
+    temp.u->objRef.number = num;
+  }*/
+  /*stack[stackPointer]=num;*/
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){
@@ -427,10 +450,33 @@ void push(int num){
 
 int pop(void){
   stackPointer--;
+
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer < 0){
     printf("Stackposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
-  return stack[stackPointer];
+
+  return getStackVal(stackPointer);
 }
+
+void newStackVal(int i, int num, bool isNumber){
+  /*stack[i] = malloc(sizeof(StackItem));*/
+  if(isNumber==true){
+    stack[i].isNumber = true;
+    stack[i].u.number = num;
+  }else{
+    stack[i].isNumber = false;
+    stack[i].u.objRef = malloc(sizeof(Object));
+    *stack[i].u.objRef = num;
+  }
+}
+
+int getStackVal(int i){
+  if(stack[i].isNumber==true){
+    return stack[i].u.number;
+  }else{
+    return *stack[i].u.objRef;
+  }
+}
+

@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "njvm.h"
+/*--- njvm.h ---*/
 
 /* begin instructions */
 #define HALT 0
@@ -44,13 +40,28 @@
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
 
-
+/* size of the Stack */
 #define stackSize 1024
 
+
+/* Objekt declaration */
+typedef int Object;
+typedef Object *ObjRef;
+
+typedef struct{
+  bool isNumber;
+  union{
+    ObjRef objRef;
+    int number;
+  }u;
+}StackItem;
+
+
+/* funktionen */
 void printHelp(void);
 void program(unsigned int *code);
 void printProgram(unsigned int *code);
-void push(int num);
+void push(int num, bool isNumber);
 int pop(void);
 void pushFrame(int num, int point);
 int popFrame(int point);
@@ -58,3 +69,5 @@ int compare(int n1, int n2, int instruction);
 void openFile(int i, int argc, char *argv[]);
 void closeFile(void);
 void debug(void);
+void newStackVal(int i, int num, bool isNumber);
+int getStackVal(int i);
