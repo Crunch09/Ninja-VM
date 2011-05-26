@@ -1,5 +1,6 @@
 /*--- njvm.h ---*/
 
+
 /* begin instructions */
 #define HALT 0
 #define PUSHC 1 /*pushc <n>*/
