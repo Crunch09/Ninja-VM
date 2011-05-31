@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "njvm.h"
-
 /* Ninja Virtual Machine */
 
 /* include libs */
@@ -117,22 +111,52 @@ void debug(void){
   printProgram(programPointer);
 
   while(programCounter<numberInstructions){
-    printf("DEBUG: is (inspect stack), l (list), s (step), r (run), q (quit)?: ");
+    printf("DEBUG: i (inspect), l (list), s (step), r (run), q (quit)?: ");
     scanf("%s",inputString);
 
-    if(strcmp(inputString,"is")==0){
-      for(j=stackPointer;j>-1;j--){ /* stack von oben nach unten durchgehen */
-	      if(j==stackPointer && j==framePointer)
-	        printf("sp, fp ---> %04d: xxxx\n",j);
-	      else if(j==stackPointer)
-	        printf("sp -------> %04d: xxxx\n",j);
-	      else if(j==framePointer)
-	        printf("fp -------> %04d: %4d\n",j,getStackVal(j));
-	      else
-	        printf("            %04d: %4d\n",j,getStackVal(j));
+    if(strcmp(inputString,"i")==0){
+			printf("DEBUG, inspect: s (stack), o (object) ?: ");
+			scanf("%s", inputString);
+			
+			if(strcmp(inputString, "s")== 0){
+      	for(j=stackPointer;j>-1;j--){ /* stack von oben nach unten durchgehen */
+	  	    if(j==stackPointer && j==framePointer){
+	  	      printf("sp, fp --->  %04d: (xxxxxx) xxxx\n",j);
+	  	    }else if(j==stackPointer){
+	  	      printf("sp ------->  %04d: (xxxxxx) xxxx\n",j);
+	  	    }else{
+						char * ausgabeString;
+						if(j==framePointer){
+							ausgabeString = "fp -------> ";
+						}else{
+							ausgabeString = "            ";
+						}
+	  	      printf("%s %04d: (%s): ",ausgabeString, j, getTypeOfVariable(j));
+	          if(stack[j].isNumber == true){
+							printf("%4d\n", stack[j].u.number);
+	          }else{
+		          if(getHeapAddress(j) == NULL){
+								printf("(nil)\n");
+		          }else{
+								printf("%p\n", getHeapAddress(j));
+		          }
+	          }
+	        }
+      	}
+      	printf("--- bottom of stack ---\n");
+      	printProgram(programPointer);
       }
-      printf("--- bottom of stack ---\n");
-      printProgram(programPointer);
+      else if(strcmp(inputString, "o")== 0){
+				long blub;
+				ObjRef objAtAddress;
+				/*blub = strtol(hexZahl, NULL, 16);*/
+				blub = 0x1001000e0;
+				objAtAddress = malloc(sizeof(Object));
+				/*printf("object reference? 0x");*/
+				objAtAddress = (int *) blub;
+				printf("%d\n", *objAtAddress);
+				
+      }
     }else if(strcmp(inputString,"l")==0){
       tempInstruction=programCounter; /* temporaere speicherung programCounter  */
       for(programCounter=0;programCounter<numberInstructions;programCounter++){
@@ -485,4 +509,18 @@ int getStackVal(int i){
     return *stack[i].u.objRef;
   }
 }
+
+char *getTypeOfVariable(int j){
+	if(stack[j].isNumber == true){
+		return "number";
+	}else{
+		return "objref";
+	}
+}
+
+void *getHeapAddress(int i){
+	return stack[i].u.objRef;
+}
+
+
 

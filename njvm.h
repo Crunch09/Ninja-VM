@@ -72,3 +72,5 @@ void closeFile(void);
 void debug(void);
 void newStackVal(int i, int num, bool isNumber);
 int getStackVal(int i);
+char *getTypeOfVariable(int j);
+void *getHeapAddress(int i);
