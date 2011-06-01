@@ -144,24 +144,24 @@ void debug(void){
 	        }
       	}
       	printf("--- bottom of stack ---\n");
-      	printProgram(programPointer);
+      	
       }
       else if(strcmp(inputString, "o")== 0){
-				char *zahl;
-				char *praefix;
-				long hexZahl;
+				unsigned long hexZahl;
+				char zahl[12];
 				ObjRef objAtAddress;
 				objAtAddress = malloc(sizeof(Object));
-				praefix = "0x";
+				if(objAtAddress == NULL){
+					printf("Couldn't alloc heap for ObjRef.\n");
+					exit(-99);
+				}
 				printf("object reference? 0x");
-				scanf("%s", zahl);
-				strcat(praefix, zahl);
-				printf("%s", praefix);
-				/*hexZahl = strtol(praefix, NULL, 16);
-				printf("%d\n", hexZahl);
-				objAtAddress = (int *) zahl;
-				printf("%d\n", *objAtAddress);*/
-				
+				scanf("%12s", zahl);
+				hexZahl = strtoul(zahl, NULL, 16);
+				objAtAddress = (int *) hexZahl;
+				printf("value = %d\n", *objAtAddress);
+				printProgram(programPointer);
+						
       }
     }else if(strcmp(inputString,"l")==0){
       tempInstruction=programCounter; /* temporaere speicherung programCounter  */
