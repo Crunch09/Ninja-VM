@@ -150,7 +150,7 @@ void debug(void){
 				long blub;
 				ObjRef objAtAddress;
 				/*blub = strtol(hexZahl, NULL, 16);*/
-				blub = 0x1001000e0;
+				blub = 4296016096;
 				objAtAddress = malloc(sizeof(Object));
 				/*printf("object reference? 0x");*/
 				objAtAddress = (int *) blub;
