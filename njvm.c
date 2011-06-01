@@ -147,14 +147,20 @@ void debug(void){
       	printProgram(programPointer);
       }
       else if(strcmp(inputString, "o")== 0){
-				long blub;
+				char *zahl;
+				char *praefix;
+				long hexZahl;
 				ObjRef objAtAddress;
-				/*blub = strtol(hexZahl, NULL, 16);*/
-				blub = 0x1001000e0;
 				objAtAddress = malloc(sizeof(Object));
-				/*printf("object reference? 0x");*/
-				objAtAddress = (int *) blub;
-				printf("%d\n", *objAtAddress);
+				praefix = "0x";
+				printf("object reference? 0x");
+				scanf("%s", zahl);
+				strcat(praefix, zahl);
+				printf("%s", praefix);
+				/*hexZahl = strtol(praefix, NULL, 16);
+				printf("%d\n", hexZahl);
+				objAtAddress = (int *) zahl;
+				printf("%d\n", *objAtAddress);*/
 				
       }
     }else if(strcmp(inputString,"l")==0){
