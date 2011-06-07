@@ -115,63 +115,64 @@ void debug(void){
     scanf("%s",inputString);
 
     if(strcmp(inputString,"i")==0){
-			printf("DEBUG, inspect: s (stack), o (object) ?: ");
-			scanf("%s", inputString);
+      printf("DEBUG, inspect: s (stack), o (object) ?: ");
+      scanf("%s", inputString);
 			
-			if(strcmp(inputString, "s")== 0){
+      if(strcmp(inputString, "s")== 0){
       	for(j=stackPointer;j>-1;j--){ /* stack von oben nach unten durchgehen */
-	  	    if(j==stackPointer && j==framePointer){
-	  	      printf("sp, fp --->  %04d: (xxxxxx) xxxx\n",j);
-	  	    }else if(j==stackPointer){
-	  	      printf("sp ------->  %04d: (xxxxxx) xxxx\n",j);
-	  	    }else{
-						char * ausgabeString;
-						if(j==framePointer){
-							ausgabeString = "fp -------> ";
-						}else{
-							ausgabeString = "            ";
-						}
-	  	      printf("%s %04d: (%s): ",ausgabeString, j, getTypeOfVariable(j));
-	          if(stack[j].isNumber == true){
-							printf("%4d\n", stack[j].u.number);
-	          }else{
-		          if(getHeapAddress(j) == NULL){
-								printf("(nil)\n");
-		          }else{
-								printf("%p\n", getHeapAddress(j));
-		          }
-	          }
-	        }
+	  if(j==stackPointer && j==framePointer){
+	    printf("sp, fp --->  %04d: (xxxxxx) xxxx\n",j);
+	  }else if(j==stackPointer){
+	    printf("sp ------->  %04d: (xxxxxx) xxxx\n",j);
+	  }else{
+	    char * ausgabeString;
+	    if(j==framePointer){
+	      ausgabeString = "fp -------> ";
+	    }else{
+	      ausgabeString = "            ";
+	    }
+
+	    printf("%s %04d: (%s): ",ausgabeString, j, getTypeOfVariable(j));
+	    if(stack[j].isNumber == true){
+	      printf("%4d\n", stack[j].u.number);
+	    }else{
+	      if(getHeapAddress(j) == NULL){
+		printf("(nil)\n");
+	      }else{
+		printf("%p\n", getHeapAddress(j));
+	      }
+	    }
+	  }
       	}
       	printf("--- bottom of stack ---\n");
-      	printProgram(programPointer);
+      	
       }
       else if(strcmp(inputString, "o")== 0){
-				char *zahl;
-				char *praefix = "0x";
-				long hexZahl;
-				ObjRef objAtAddress = malloc(sizeof(Object));
-				printf("object reference? 0x");
-				scanf("%s", zahl);
-				printf("%s",zahl);
-				strcat(praefix, zahl);
-				printf("%s", praefix);
-				/*hexZahl = strtol(praefix, NULL, 16);
-				printf("%d\n", hexZahl);
-				objAtAddress = (int *) zahl;
-				printf("%d\n", *objAtAddress);*/
-				
+	unsigned long hexZahl;
+	char zahl[12];
+	objRef objAtAddress;
+	objAtAddress = malloc(sizeof(Object));
+	if(objAtAddress == NULL){
+	  printf("Couldn't alloc heap for ObjRef.\n");
+	  exit(-99);
+	}
+	printf("object reference? 0x");
+	scanf("%12s", zahl);
+	hexZahl = strtoul(zahl, NULL, 16);
+	objAtAddress = (int *) hexZahl;
+	printf("value = %d\n", *objAtAddress);
+	printProgram(programPointer);						
       }
     }else if(strcmp(inputString,"l")==0){
       tempInstruction=programCounter; /* temporaere speicherung programCounter  */
       for(programCounter=0;programCounter<numberInstructions;programCounter++){
-          if(programCounter == tempInstruction){
-            printf("\033[31m");
-            printProgram(programPointer);
-            printf("\033[0m"); 
-          }else{
-	       printProgram(programPointer);
-	      }
+        if(programCounter == tempInstruction){
+          printf("\033[31m");
+          printProgram(programPointer);
+          printf("\033[0m"); 
+        }else{
+	  printProgram(programPointer);
+	}
       }
 
       printf("--- end of code ---\n");
