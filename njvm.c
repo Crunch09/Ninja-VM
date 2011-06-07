@@ -1,5 +1,5 @@
 /* Ninja Virtual Machine */
-
+/*ab*/
 /* include libs */
 #include <stdio.h>
 #include <stdlib.h>
