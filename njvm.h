@@ -38,15 +38,37 @@
 #define DUP 27
 /* end instructions */
 
+
+/* begin makros */
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
+
+#define MSB (1<<(8*sizeof(unsigned int)-1))
+#define COUNT_IS_BYTES(size) (((size)&MSB)!=0)
+#define COUNT_IS_OBJREFS(size) (((size)&MSB)==0)
+#define COUNT_FROM_SIZE(size) ((size)& ~MSB)
+
+#define OBJ_HAS_BYTES(objref) COUNT_IS_BYTES((objref)->size)
+#define OBJ_HAS_OBJREF(objref) COUNT_IS_OBJREFS((objref)->size)
+#define COUNT_FROM_OBJREF(objref) COUNT_FROM_SIZE((objref)->size)
+/* end makros */
+
 
 /* size of the Stack */
 #define stackSize 1024
 
 
 /* Objekt declaration */
-typedef int Object;
+typedef union{
+  struct object *field[1];
+  unsigned char byte[1];
+}Data;
+
+typedef struct object{
+  unsigned int size;
+  Data data;
+}Object;
+
 typedef Object *ObjRef;
 
 typedef struct{
