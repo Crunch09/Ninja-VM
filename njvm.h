@@ -13,10 +13,10 @@
 #define RDINT 7
 #define WRINT 8
 
-#define ASF 9 /*asf <n>*/
+#define ASF 9    /*asf <n>*/
 #define RSF 10
 #define PUSHL 11 /*pushl <n>, wert von frame in stack*/
-#define POPL 12 /*popl <n>, wert von stack in frame*/
+#define POPL 12  /*popl <n>, wert von stack in frame*/
 
 #define EQ 13  /* == */
 #define NE 14  /* != */
@@ -29,13 +29,26 @@
 #define BRF 20 /* brf <target> */
 #define BRT 21 /* brt <target> */
 
-#define CALL 22 /* call <target> */
+#define CALL 22   /* call <target> */
 #define RET 23
-#define DROP 24 /* drop  <n> */
+#define DROP 24   /* drop  <n> */
 #define PUSHR 25
 #define POPR 26
 
 #define DUP 27
+
+#define NEW 28  /* new <n> */
+#define GETF 29 /* getf <n> */
+#define PUTF 30 /* putf <n> */
+
+#define NEWA 31
+#define GETLA 32
+#define GETFA 33
+#define PUTFA 34
+
+#define PUSHN 35
+#define REFEQ 36
+#define REFNE 37
 /* end instructions */
 
 

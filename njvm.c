@@ -1,5 +1,5 @@
 /* Ninja Virtual Machine */
-/*ab*/
+
 /* include libs */
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,10 +144,8 @@ void debug(void){
 	    }
 	  }
       	}
-      	printf("--- bottom of stack ---\n");
-      	
-      }
-      else if(strcmp(inputString, "o")== 0){
+      	printf("--- bottom of stack ---\n");	
+      }else if(strcmp(inputString, "o")== 0){
 	unsigned long hexZahl;
 	char zahl[12];
 	objRef objAtAddress;
@@ -258,6 +256,26 @@ void printProgram(unsigned int *code){
     printf("%03d: popr\n",programCounter);
   }else if(zeile==DUP){
     printf("%03d: dup\n",programCounter);
+  }else if(zeile==NEW){
+    printf("%03d: new %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==GETF){
+    printf("%03d: getf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==PUTF){
+    printf("%03d: putf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==NEWA){
+    printf("%03d: newa\n",programCounter);
+  }else if(zeile==GETLA){
+    printf("%03d: getla\n",programCounter);
+  }else if(zeile==GETFA){
+    printf("%03d: getfa\n",programCounter);
+  }else if(zeile==PUTFA){
+    printf("%03d: putfa\n",programCounter);
+  }else if(zeile==PUSHN){
+    printf("%03d: pushn\n",programCounter);
+  }else if(zeile==REFEQ){
+    printf("%03d: refeq\n",programCounter);
+  }else if(zeile==REFNE){
+    printf("%03d: refne\n",programCounter);
   }
 }
 
@@ -304,11 +322,11 @@ void program(unsigned int *code){
       n1=pop();
       n2=pop();
       
-	  if(n1!=0){
-		push(n2%n1, false);
-	  }else{
-		printf("Modulo by Zero not possible. Programm will be stopped.\n");
-        exit(-99);
+      if(n1!=0){
+	push(n2%n1, false);
+      }else{
+	printf("Modulo by Zero not possible. Programm will be stopped.\n");
+         exit(-99);
       }
       break;
     case RDINT: /* liest Zahl auf der konsole ein */
@@ -424,6 +442,17 @@ void program(unsigned int *code){
       /*n2 = n1;*/
       push(n1, false);
       push(n1, false);
+    case NEW:
+      n1 = IMMEDIATE(instructions);
+    case GETF:
+    case PUTF:
+    case NEWA:
+    case GETLA:
+    case GETFA:
+    case PUTFA:
+    case PUSHN:
+    case REFEQ:
+    case REFNE:
   }
 }
 
@@ -496,12 +525,19 @@ int pop(void){
   return getStackVal(stackPointer);
 }
 
+/*##################################################################*/
 void newStackVal(int i, int num, bool isNumber){
+  Object *objRef;
+
   /*stack[i] = malloc(sizeof(StackItem));*/
   if(isNumber==true){
-    stack[i].isNumber = true;
+    objRef = allocMem(sizeof(Object)-sizeof(Data)+1*sizeof(int));
+    objRef->size = (1*sizeof(int) | MSB );
+    *(int *)&objRef->data.byte[0]=value;
+
+ stack[i].isNumber = true;
     stack[i].u.number = num;
-  }else{
+  2}else{
     stack[i].isNumber = false;
     stack[i].u.objRef = malloc(sizeof(Object));
     *stack[i].u.objRef = num;
@@ -517,15 +553,15 @@ int getStackVal(int i){
 }
 
 char *getTypeOfVariable(int j){
-	if(stack[j].isNumber == true){
-		return "number";
-	}else{
-		return "objref";
-	}
+  if(stack[j].isNumber == true){
+    return "number";
+  }else{
+    return "objref";
+  }
 }
 
 void *getHeapAddress(int i){
-	return stack[i].u.objRef;
+  return stack[i].u.objRef;
 }
 
 
