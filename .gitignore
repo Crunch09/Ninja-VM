@@ -3,6 +3,7 @@ njvm.o
 njvm-linux
 bin/
 .njvm.c.swp
+.njvm.h.swp
 njvm.c.orig
 test_njvm.c
 *.bin

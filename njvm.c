@@ -150,17 +150,19 @@ void debug(void){
       else if(strcmp(inputString, "o")== 0){
 	unsigned long hexZahl;
 	char zahl[12];
-	objRef objAtAddress;
-	objAtAddress = malloc(sizeof(Object));
+	StackItem objAtAddress;
+	/*objAtAddress = malloc(sizeof(StackItem));
 	if(objAtAddress == NULL){
-	  printf("Couldn't alloc heap for ObjRef.\n");
+	  printf("Couldn't alloc heap for StackItem.\n");
 	  exit(-99);
-	}
+	}*/
 	printf("object reference? 0x");
 	scanf("%12s", zahl);
 	hexZahl = strtoul(zahl, NULL, 16);
-	objAtAddress = (int *) hexZahl;
-	printf("value = %d\n", *objAtAddress);
+        objAtAddress.u.objRef = malloc(sizeof(Object));
+	objAtAddress.u.objRef = (int *) hexZahl;
+
+	printf("value = %d\n", (int) *objAtAddress.u.objRef);
 	printProgram(programPointer);						
       }
     }else if(strcmp(inputString,"l")==0){
@@ -258,6 +260,26 @@ void printProgram(unsigned int *code){
     printf("%03d: popr\n",programCounter);
   }else if(zeile==DUP){
     printf("%03d: dup\n",programCounter);
+  }else if(zeile==NEW){
+    printf("%03d: new %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==GETF){
+    printf("%03d: getf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==PUTF){
+    printf("%03d: putf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+  }else if(zeile==NEWA){
+    printf("%03d: newa\n",programCounter);
+  }else if(zeile==GETLA){
+    printf("%03d: getla\n",programCounter);
+  }else if(zeile==GETFA){
+    printf("%03d: getfa\n",programCounter);
+  }else if(zeile==PUTFA){
+    printf("%03d: putfa\n",programCounter);
+  }else if(zeile==PUSHN){
+    printf("%03d: pushn\n",programCounter);
+  }else if(zeile==REFEQ){
+    printf("%03d: refeq\n",programCounter);
+  }else if(zeile==REFNE){
+    printf("%03d: refne\n",programCounter);
   }
 }
 
@@ -497,7 +519,7 @@ int pop(void){
 }
 
 void newStackVal(int i, int num, bool isNumber){
-  /*stack[i] = malloc(sizeof(StackItem));*/
+ /* stack[i] = malloc(sizeof(StackItem));*/
   if(isNumber==true){
     stack[i].isNumber = true;
     stack[i].u.number = num;

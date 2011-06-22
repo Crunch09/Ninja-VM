@@ -36,6 +36,17 @@
 #define POPR 26
 
 #define DUP 27
+
+#define NEW 28
+#define GETF 29
+#define PUTF 30
+#define NEWA 31
+#define GETLA 32
+#define GETFA 33
+#define PUTFA 34
+#define PUSHN 35
+#define REFEQ 36
+#define REFNE 37
 /* end instructions */
 
 
