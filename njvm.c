@@ -443,7 +443,8 @@ void program(unsigned int *code){
       push(n1, false);
       push(n1, false);
     case NEW:
-      n1 = IMMEDIATE(instructions);
+      n1 = pop();
+      
     case GETF:
     case PUTF:
     case NEWA:
@@ -526,21 +527,20 @@ int pop(void){
 }
 
 /*##################################################################*/
-void newStackVal(int i, int num, bool isNumber){
+void newStackVal(int i, int size, int num, bool isNumber){
   Object *objRef;
 
-  /*stack[i] = malloc(sizeof(StackItem));*/
   if(isNumber==true){
-    objRef = allocMem(sizeof(Object)-sizeof(Data)+1*sizeof(int));
-    objRef->size = (1*sizeof(int) | MSB );
-    *(int *)&objRef->data.byte[0]=value;
-
- stack[i].isNumber = true;
+    stack[i].isNumber = true;
     stack[i].u.number = num;
-  2}else{
+  }else{
+    /* speicher freigeben */
+    objRef = allocMem(sizeof(Object)-sizeof(Data)+size*sizeof(int));
+    objRef->size = (1*sizeof(int) | MSB );
+    /* Wert in primitives objekt schreiben */
     stack[i].isNumber = false;
-    stack[i].u.objRef = malloc(sizeof(Object));
-    *stack[i].u.objRef = num;
+    stack[i].u.objRef = objRef;
+    /*stack[i].u.objRef = num;*/
   }
 }
 

@@ -105,7 +105,7 @@ int compare(int n1, int n2, int instruction);
 void openFile(int i, int argc, char *argv[]);
 void closeFile(void);
 void debug(void);
-void newStackVal(int i, int num, bool isNumber);
+void newStackVal(int i, int size, int num, bool isNumber);
 int getStackVal(int i);
 char *getTypeOfVariable(int j);
 void *getHeapAddress(int i);
