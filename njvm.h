@@ -13,10 +13,10 @@
 #define RDINT 7
 #define WRINT 8
 
-#define ASF 9 /*asf <n>*/
+#define ASF 9    /*asf <n>*/
 #define RSF 10
 #define PUSHL 11 /*pushl <n>, wert von frame in stack*/
-#define POPL 12 /*popl <n>, wert von stack in frame*/
+#define POPL 12  /*popl <n>, wert von stack in frame*/
 
 #define EQ 13  /* == */
 #define NE 14  /* != */
@@ -29,21 +29,32 @@
 #define BRF 20 /* brf <target> */
 #define BRT 21 /* brt <target> */
 
-#define CALL 22 /* call <target> */
+#define CALL 22   /* call <target> */
 #define RET 23
-#define DROP 24 /* drop  <n> */
+#define DROP 24   /* drop  <n> */
 #define PUSHR 25
 #define POPR 26
 
 #define DUP 27
 
+<<<<<<< HEAD
 #define NEW 28
 #define GETF 29
 #define PUTF 30
+=======
+#define NEW 28  /* new <n> */
+#define GETF 29 /* getf <n> */
+#define PUTF 30 /* putf <n> */
+
+>>>>>>> 0.6
 #define NEWA 31
 #define GETLA 32
 #define GETFA 33
 #define PUTFA 34
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0.6
 #define PUSHN 35
 #define REFEQ 36
 #define REFNE 37
@@ -103,7 +114,7 @@ int compare(int n1, int n2, int instruction);
 void openFile(int i, int argc, char *argv[]);
 void closeFile(void);
 void debug(void);
-void newStackVal(int i, int num, bool isNumber);
+Object *newStackVal(bool isObject, int size);
 int getStackVal(int i);
 char *getTypeOfVariable(int j);
 void *getHeapAddress(int i);

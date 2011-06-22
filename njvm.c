@@ -1,5 +1,5 @@
 /* Ninja Virtual Machine */
-/*ab*/
+
 /* include libs */
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,18 +144,11 @@ void debug(void){
 	    }
 	  }
       	}
-      	printf("--- bottom of stack ---\n");
-      	
-      }
-      else if(strcmp(inputString, "o")== 0){
+      	printf("--- bottom of stack ---\n");	
+      }else if(strcmp(inputString, "o")== 0){
 	unsigned long hexZahl;
 	char zahl[12];
 	StackItem objAtAddress;
-	/*objAtAddress = malloc(sizeof(StackItem));
-	if(objAtAddress == NULL){
-	  printf("Couldn't alloc heap for StackItem.\n");
-	  exit(-99);
-	}*/
 	printf("object reference? 0x");
 	scanf("%12s", zahl);
 	hexZahl = strtoul(zahl, NULL, 16);
@@ -326,11 +319,11 @@ void program(unsigned int *code){
       n1=pop();
       n2=pop();
       
-	  if(n1!=0){
-		push(n2%n1, false);
-	  }else{
-		printf("Modulo by Zero not possible. Programm will be stopped.\n");
-        exit(-99);
+      if(n1!=0){
+	push(n2%n1, false);
+      }else{
+	printf("Modulo by Zero not possible. Programm will be stopped.\n");
+         exit(-99);
       }
       break;
     case RDINT: /* liest Zahl auf der konsole ein */
@@ -430,6 +423,7 @@ void program(unsigned int *code){
       break;
     case DROP: /* loescht n Werte aus dem Stack */
       n1 = IMMEDIATE(code[programCounter]);
+      /*objRef = newStackVal(true, n1);*/
       while(n1 > 0){
         pop();
         n1--;
@@ -446,6 +440,35 @@ void program(unsigned int *code){
       /*n2 = n1;*/
       push(n1, false);
       push(n1, false);
+    case NEW:
+      n1 = IMMEDIATE(instruction);
+      stack[stackPointer].u.objRef = newStackVal(false, n1);
+      stackPointer++;
+      break;
+    case GETF:
+      n1 = IMMEDIATE(instruction);
+      n2 = getf(n1);
+      push(n2, false);
+      break;
+    case PUTF:
+      n1 = IMMEDIATE(instruction);
+      n2 = pop();
+      putf(n1, n2);
+      break;
+    case NEWA:
+      break;
+    case GETLA:
+      break;
+    case GETFA:
+      break;
+    case PUTFA:
+      break;
+    case PUSHN:
+      break;
+    case REFEQ:
+      break;
+    case REFNE:
+      break;
   }
 }
 
@@ -475,7 +498,7 @@ int compare(int n1, int n2, int instruction){
 /*push und pop funktionen fuer frame stack*/
 void pushFrame(int num, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  newStackVal(i, num, true);
+  stack[i].u.objRef = newStackVal(true, num);
 }
 int popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
@@ -484,20 +507,18 @@ int popFrame(int point){
 
 
 void push(int num, bool isNumber){
-  /*StackItem[stackPointer] =  malloc(sizeof(StackItem));*/
-  newStackVal(stackPointer, num, isNumber);
+  Object *objRef;
 
-  /*if(isNumber==true){
-    temp.isNumber = true;
-    temp.u->number = num;
-    stack[stackPointer] = temp;
+  if(isNumber){
+    stack[stackPointer].isNumber = true;
+    stack[stackPointer].u.number = num;
   }else{
-    temp.isNumber = false;
-    temp.u->objRef = malloc(sizeof(StackItem));
-    temp.u->objRef.isNumber = true;
-    temp.u->objRef.number = num;
-  }*/
-  /*stack[stackPointer]=num;*/
+    objRef = newStackVal(false, 1);
+    *(int *)&objRef->data.byte[0]=num;
+    stack[stackPointer].isNumber = false;
+    stack[stackPointer].u.objRef = objRef;
+  }
+
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){
@@ -518,36 +539,96 @@ int pop(void){
   return getStackVal(stackPointer);
 }
 
+<<<<<<< HEAD
 void newStackVal(int i, int num, bool isNumber){
  /* stack[i] = malloc(sizeof(StackItem));*/
   if(isNumber==true){
     stack[i].isNumber = true;
     stack[i].u.number = num;
-  }else{
-    stack[i].isNumber = false;
-    stack[i].u.objRef = malloc(sizeof(Object));
-    *stack[i].u.objRef = num;
+=======
+int getf(int index){
+  Object *objRef;
+
+  /* Überprüfen, ob die Position innerhalb des Stacks liegt */
+  stackPointer--;
+  if(stackPointer < 0){
+    printf("Stackposition out of Range. Program will be stopped.\n");
+    exit(-99);
   }
+
+  if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
+    printf("Index of range.\n");
+    exit(-99);
+  }
+
+  objRef = stack[stackPointer].u.objRef;
+  if(OBJ_HAS_BYTES(objRef))
+    return (int)objRef->data.byte[index];
+  if(OBJ_HAS_OBJREF(objRef))
+    return (int)objRef->data.field[index];
+}
+
+void putf(int index, int value){
+  Object *objRef;
+  
+  if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
+    printf("Index of range.\n");
+    exit(-99);
+  }
+
+  stack[stackPointer].u.objRef->data->byte[index] = (byte)value;
+  
+}
+
+Object *newStackVal(bool isObject, int size){
+  Object *objRef;
+  int i;
+
+  /* speicher freigeben */
+  if(!isObject){
+    objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(int));
+    if(objRef==NULL){
+      printf("no memory");
+      exit(-99);
+    }
+
+    objRef->size = (unsigned int)(1*sizeof(unsigned int) | MSB );
+  }else{
+    objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(objRef));
+    if(objRef==NULL){
+      printf("no memory");
+      exit(-99);
+    }
+
+    objRef->size = size;
+    for(i=0; i<size; i++){
+      objRef->data.field[i] = NULL;
+    }
+  }
+
+  return objRef;
 }
 
 int getStackVal(int i){
-  if(stack[i].isNumber==true){
+  if(stack[i].isNumber){
     return stack[i].u.number;
   }else{
-    return *stack[i].u.objRef;
+    return (int)stack[i].u.objRef->data.byte[0];
   }
 }
 
 char *getTypeOfVariable(int j){
-	if(stack[j].isNumber == true){
-		return "number";
-	}else{
-		return "objref";
-	}
+  if(stack[j].isNumber == true){
+    return "number";
+  }else{
+    return "objref";
+  }
 }
 
+
+
 void *getHeapAddress(int i){
-	return stack[i].u.objRef;
+  return stack[i].u.objRef;
 }
 
 
