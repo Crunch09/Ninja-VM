@@ -37,24 +37,15 @@
 
 #define DUP 27
 
-<<<<<<< HEAD
-#define NEW 28
-#define GETF 29
-#define PUTF 30
-=======
 #define NEW 28  /* new <n> */
 #define GETF 29 /* getf <n> */
 #define PUTF 30 /* putf <n> */
 
->>>>>>> 0.6
 #define NEWA 31
 #define GETLA 32
 #define GETFA 33
 #define PUTFA 34
-<<<<<<< HEAD
-=======
 
->>>>>>> 0.6
 #define PUSHN 35
 #define REFEQ 36
 #define REFNE 37
@@ -108,6 +99,7 @@ void program(unsigned int *code);
 void printProgram(unsigned int *code);
 void push(int num, bool isNumber);
 int pop(void);
+Object *popObject(void);
 void pushFrame(int num, int point);
 int popFrame(int point);
 int compare(int n1, int n2, int instruction);
@@ -118,3 +110,5 @@ Object *newStackVal(bool isObject, int size);
 int getStackVal(int i);
 char *getTypeOfVariable(int j);
 void *getHeapAddress(int i);
+Object *getf(int index);
+void putf(int index, Object *objValue, Object *objRef);
