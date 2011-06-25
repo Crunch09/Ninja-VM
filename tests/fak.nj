@@ -1,7 +1,0 @@
-void main(){
-  local integer x;
-  local integer fak;
-  x = read();
-
-  fak = 
-}
