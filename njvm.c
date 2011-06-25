@@ -102,6 +102,7 @@ void printHelp(void){
 /* debuger */
 void debug(void){
   int numberInstructions,tempInstruction,j;
+  unsigned int sizeArray, i;
   char inputString[5];
 
   numberInstructions=fileSize/sizeof(programPointer[0]);
@@ -149,6 +150,8 @@ void debug(void){
 	unsigned long hexZahl;
 	char zahl[12];
 	int *objAtAddress;
+	StackItem *temp;
+
 	objAtAddress = malloc(sizeof(Object));
 	if(objAtAddress == NULL){
 	  printf("Couldn't alloc heap for ObjRef.\n");
@@ -158,7 +161,25 @@ void debug(void){
 	scanf("%12s", zahl);
 	hexZahl = strtoul(zahl, NULL, 16);
 	objAtAddress = (int *) hexZahl;
-	printf("value = %d\n", *objAtAddress);
+	temp = &objAtAddress;
+
+	/* print obj */
+	if(OBJ_HAS_BYTES(temp->u.objRef)){
+	  for(i=0;i<4;i++){
+	    printf("byte[%d] = 0x%02x\n", i, temp->u.objRef->data.byte[i]);
+	  }
+	}
+	if(OBJ_HAS_OBJREF(temp->u.objRef)){
+	  sizeArray = COUNT_FROM_OBJREF(temp->u.objRef);
+	  for(i=0;i<sizeArray;i++){
+	    if(temp->u.objRef->data.field[i]!=NULL){
+	      printf("field[%d] = %p\n",i,(void *)temp->u.objRef->data.field[i]);
+	    }else{
+	      printf("field[%d] = nil\n",i);
+	    }
+	  }
+	}
+
 	printProgram(programPointer);						
       }
     }else if(strcmp(inputString,"l")==0){
@@ -283,6 +304,8 @@ void printProgram(unsigned int *code){
 void program(unsigned int *code){
   int instruction, eingeleseneZahl;
   unsigned int n1, n2;
+  Object *n1Object, *n2Object;
+
   instruction=(code[programCounter]&0xFF000000)>>24;
 
   switch(instruction){
@@ -418,11 +441,11 @@ void program(unsigned int *code){
       }
       break;
     case CALL:
-      push(programCounter, true); /* programCounter wird zwischen gespeichert, fuer spaetere ruecksprung */
+      push(programCounter+1, true); /* programCounter wird zwischen gespeichert, fuer spaetere ruecksprung */
       programCounter=IMMEDIATE(code[programCounter])-1;
       break;
     case RET:
-      programCounter=pop();
+      programCounter=pop()-1;
       break;
     case DROP: /* loescht n Werte aus dem Stack */
       n1 = IMMEDIATE(code[programCounter]);
@@ -439,24 +462,25 @@ void program(unsigned int *code){
       returnRegister = pop();
       break;
     case DUP: /* dupliziert obersten Wert in dem Stack */
-      n1 = pop();
-      /*n2 = n1;*/
-      push(n1, false);
-      push(n1, false);
+      stack[stackPointer].isNumber = false;
+      stack[stackPointer].u.objRef = getHeapAddress(stackPointer-1);
+      stackPointer++;
+      break;
     case NEW:
-      n1 = IMMEDIATE(instruction);
-      stack[stackPointer].u.objRef = newStackVal(false, n1);
+      n1 = IMMEDIATE(code[programCounter]);
+      stack[stackPointer].u.objRef = newStackVal(true, n1);
+      stack[stackPointer].isNumber = false;
       stackPointer++;
       break;
     case GETF:
-      n1 = IMMEDIATE(instruction);
-      n2 = getf(n1);
+      n1 = IMMEDIATE(code[programCounter]);
+      getf(n1);
       push(n2, false);
       break;
     case PUTF:
-      n1 = IMMEDIATE(instruction);
-      n2 = pop();
-      putf(n1, n2);
+      n1Object = popObject();
+      n2Object = popObject();
+      putf(IMMEDIATE(code[programCounter]), n1Object, n2Object);
       break;
     case NEWA:
       break;
@@ -542,7 +566,12 @@ int pop(void){
   return getStackVal(stackPointer);
 }
 
-int getf(int index){
+Object *popObject(void){
+  stackPointer--;
+  return stack[stackPointer].u.objRef;
+}
+
+Object *getf(int index){
   Object *objRef;
 
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
@@ -558,22 +587,18 @@ int getf(int index){
   }
 
   objRef = stack[stackPointer].u.objRef;
-  if(OBJ_HAS_BYTES(objRef))
-    return (int)objRef->data.byte[index];
-  if(OBJ_HAS_OBJREF(objRef))
-    return (int)objRef->data.field[index];
+  return objRef->data.field[index];
 }
 
-void putf(int index, int value){
-  Object *objRef;
-  
+/*--- putf ---*/
+void putf(int index, Object *objValue, Object *objRef){
+
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
     printf("Index of range.\n");
     exit(-99);
   }
 
-  stack[stackPointer].u.objRef->data->byte[index] = (byte)value;
-  
+  objRef->data.field[index] = objValue;
 }
 
 Object *newStackVal(bool isObject, int size){
@@ -589,13 +614,16 @@ Object *newStackVal(bool isObject, int size){
     }
 
     objRef->size = (unsigned int)(1*sizeof(unsigned int) | MSB );
+    for(i=0; i<size; i++){
+      objRef->data.byte[i] = 0;
+    }
   }else{
     objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(objRef));
     if(objRef==NULL){
       printf("no memory");
       exit(-99);
     }
-
+    printf("Bin hier\n");
     objRef->size = size;
     for(i=0; i<size; i++){
       objRef->data.field[i] = NULL;
@@ -626,6 +654,5 @@ char *getTypeOfVariable(int j){
 void *getHeapAddress(int i){
   return stack[i].u.objRef;
 }
-
 
 
