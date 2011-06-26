@@ -149,15 +149,10 @@ void debug(void){
       }else if(strcmp(inputString, "o")== 0){
 	unsigned long hexZahl;
 	char zahl[12];
-	StackItem objAtAddress;
+	/*StackItem objAtAddress;*/
 	int *objAtAddress;
 	StackItem *temp;
 
-	objAtAddress = malloc(sizeof(Object));
-	if(objAtAddress == NULL){
-	  printf("Couldn't alloc heap for ObjRef.\n");
-	  exit(-99);
-	}
 	printf("object reference? 0x");
 	scanf("%12s", zahl);
 	hexZahl = strtoul(zahl, NULL, 16);
@@ -324,6 +319,7 @@ void program(unsigned int *code){
     case SUB:
       n1=pop();
       n2=pop();
+printf("%d-%d=%d\n",n2,n1,n2-n1);
       push(n2-n1, false);
       break;
     case MUL:
@@ -371,12 +367,15 @@ void program(unsigned int *code){
       framePointer=pop(); /*position des letzten frames wird zurueckgeschrieben*/
       break;
     case PUSHL: /*variable von frame wird in stack geschrieben*/
-      n1=popFrame(code[programCounter]);
-      push(n1, false);
+      n1Object=popFrame(code[programCounter]);
+      stack[stackPointer].isNumber = false;
+      stack[stackPointer].u.objRef=n1Object;
+      stackPointer++;
+      /*push(n1, false);Ü*/
       break;
     case POPL: /*wert vom stack wird in frame geschrieben*/
-      n1=pop();
-      pushFrame(n1,code[programCounter]);
+      stackPointer--;
+      pushFrame(stack[stackPointer].u.objRef, code[programCounter]);
       break;
     case EQ:
       n1=pop();
@@ -475,8 +474,10 @@ void program(unsigned int *code){
       break;
     case GETF:
       n1 = IMMEDIATE(code[programCounter]);
-      getf(n1);
-      push(n2, false);
+      n1Object = getf(n1);
+      stack[stackPointer].isNumber = false;
+      stack[stackPointer].u.objRef = n1Object;
+      stackPointer++;
       break;
     case PUTF:
       n1Object = popObject();
@@ -484,18 +485,56 @@ void program(unsigned int *code){
       putf(IMMEDIATE(code[programCounter]), n1Object, n2Object);
       break;
     case NEWA:
+      n1 = pop();
+      stack[stackPointer].u.objRef = newStackVal(true, n1);
+      stack[stackPointer].isNumber = false;
+      stackPointer++;
       break;
     case GETLA:
+      n1Object = popObject();
+      n1 = COUNT_FROM_OBJREF(n1Object);
+      push(n1, false);
       break;
     case GETFA:
+      n1 = pop();
+      n1Object = getf(n1);
+      stack[stackPointer].isNumber = false;
+      stack[stackPointer].u.objRef = n1Object;
+      stackPointer++;
       break;
     case PUTFA:
+      n1Object = popObject();
+      n1 = pop();
+      n2Object = popObject();
+      if(n1<0 || n1>=COUNT_FROM_OBJREF(n2Object)){
+	printf("putfa %d Error: index out of bounds exception\n", n1);
+	exit(-99);
+      }
+      putf(n1, n1Object, n2Object);
       break;
     case PUSHN:
+      stack[stackPointer].isNumber = false;
+      stack[stackPointer].u.objRef = NULL;
+      stackPointer++;
       break;
     case REFEQ:
+      n1Object = popObject();
+      n2Object = popObject();
+      if(n1Object == n2Object){
+	push(1, false);
+      }else{
+	push(0, false);
+      }
+
       break;
     case REFNE:
+      n1Object = popObject();
+      n2Object = popObject();
+      if(n1Object != n2Object){
+	push(1, false);
+      }else{
+	push(0, false);
+      }
       break;
   }
 }
@@ -524,13 +563,15 @@ int compare(int n1, int n2, int instruction){
 
 
 /*push und pop funktionen fuer frame stack*/
-void pushFrame(int num, int point){
+void pushFrame(Object *object, int point){
   int i = framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  stack[i].u.objRef = newStackVal(true, num);
+  stack[i].isNumber = false;
+  stack[i].u.objRef = object;
 }
-int popFrame(int point){
+Object *popFrame(int point){
   int i=framePointer+(SIGN_EXTEND(IMMEDIATE(point)));
-  return getStackVal(i);
+  return stack[i].u.objRef;
+  /*return getStackVal(i);*/
 }
 
 
@@ -577,17 +618,17 @@ Object *getf(int index){
 
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   stackPointer--;
+  objRef = stack[stackPointer].u.objRef;
   if(stackPointer < 0){
     printf("Stackposition out of Range. Program will be stopped.\n");
     exit(-99);
   }
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("Index of range.\n");
+    printf("getf Error: index out of bounds exception\n");
     exit(-99);
   }
 
-  objRef = stack[stackPointer].u.objRef;
   return objRef->data.field[index];
 }
 
@@ -595,7 +636,7 @@ Object *getf(int index){
 void putf(int index, Object *objValue, Object *objRef){
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("Index of range.\n");
+    printf("putf Error: index out of bounds exception\n");
     exit(-99);
   }
 
@@ -624,7 +665,6 @@ Object *newStackVal(bool isObject, int size){
       printf("no memory");
       exit(-99);
     }
-    printf("Bin hier\n");
     objRef->size = size;
     for(i=0; i<size; i++){
       objRef->data.field[i] = NULL;

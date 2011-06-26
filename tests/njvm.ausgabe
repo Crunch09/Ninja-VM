@@ -1,6 +1,46 @@
-(--------------bin/*.bin----------------)
-Couldn't open bin/*.bin . You need to use a .bin file. Try again. 
+(--------------bin/getf.bin----------------)
 Ninja Virtual Machine started
-Warning ! Couldn't close the file. 
 Ninja Virtual Machine stopped
 (------------------------------)
+(--------------bin/getf_error.bin----------------)
+Ninja Virtual Machine started
+Error: index out of bounds exception
+(------------------------------)
+(--------------bin/getfa_error.bin----------------)
+Ninja Virtual Machine started
+Error: index out of bounds exception
+(------------------------------)
+(--------------bin/mp.bin----------------)
+(------------------------------)
+(--------------bin/newa.bin----------------)
+Ninja Virtual Machine started
+Ninja Virtual Machine stopped
+(------------------------------)
+(--------------bin/prog10.bin----------------)
+Ninja Virtual Machine started
+0
+Ninja Virtual Machine stopped
+(------------------------------)
+(--------------bin/prog11.bin----------------)
+Ninja Virtual Machine started
+1
+Ninja Virtual Machine stopped
+(------------------------------)
+(--------------bin/prog12.bin----------------)
+Ninja Virtual Machine started
+0
+Ninja Virtual Machine stopped
+(------------------------------)
+(--------------bin/pushn.bin----------------)
+Ninja Virtual Machine started
+Ninja Virtual Machine stopped
+(------------------------------)
+(--------------bin/putf_error.bin----------------)
+Ninja Virtual Machine started
+Error: index out of bounds exception
+(------------------------------)
+(--------------bin/putfa_error.bin----------------)
+Ninja Virtual Machine started
+Error: index out of bounds exception
+(------------------------------)
+(--------------bin/sum.bin----------------)
