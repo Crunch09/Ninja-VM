@@ -542,8 +542,11 @@ printf("%d-%d=%d\n",n2,n1,n2-n1);
 
 
 /* Vergleicht zwei Zahlen */
-int compare(int n1, int n2, int instruction){
+int compare(int zahl1, int zahl2, int instruction){
+  unsigned int n1, n2;
   bool result = false;
+  n1 = (unsigned int) zahl1;
+  n2 = (unsigned int) zahl2;
   switch(instruction) {
     case EQ: result = (n1 == n2);
       break;
