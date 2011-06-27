@@ -361,6 +361,7 @@ printf("%d-%d=%d\n",n2,n1,n2-n1);
       push(framePointer, true); /*position des letzten frames wird gemerkt*/
       framePointer=stackPointer;
       stackPointer=stackPointer+(IMMEDIATE(code[programCounter]));
+      nullStackFrame(framePointer, stackPointer);
       break;
     case RSF: /*benutzen stack frame entfernen*/
       stackPointer=framePointer;
@@ -619,6 +620,8 @@ Object *getf(int index){
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   stackPointer--;
   objRef = stack[stackPointer].u.objRef;
+  printf("stackPointer: %d\n", stackPointer);
+  /*printf("Adresse von objRef: %x\n", (int) *objRef);*/
   if(stackPointer < 0){
     printf("Stackposition out of Range. Program will be stopped.\n");
     exit(-99);
@@ -694,6 +697,14 @@ char *getTypeOfVariable(int j){
 
 void *getHeapAddress(int i){
   return stack[i].u.objRef;
+}
+
+void nullStackFrame(int frameP, int stackP){
+    while(stackP > frameP){
+        stack[frameP].isNumber = false;
+        stack[frameP].u.objRef = NULL;
+        frameP++;
+    }
 }
 
 
