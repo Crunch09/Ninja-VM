@@ -8,7 +8,7 @@
 #include "njvm.h"
 
 
-const char version[] = "0.5";
+const char version[] = "1.0beta";
 
 /*int stack[stackSize];*/
 StackItem stack[stackSize];
@@ -122,9 +122,9 @@ void debug(void){
       if(strcmp(inputString, "s")== 0){
       	for(j=stackPointer;j>-1;j--){ /* stack von oben nach unten durchgehen */
 	  if(j==stackPointer && j==framePointer){
-	    printf("sp, fp --->  %04d: (xxxxxx) xxxx\n",j);
+	    printf("sp, fp --->  0x%08x: (xxxxxx) xxxx\n",j);
 	  }else if(j==stackPointer){
-	    printf("sp ------->  %04d: (xxxxxx) xxxx\n",j);
+	    printf("sp ------->  0x%08x: (xxxxxx) xxxx\n",j);
 	  }else{
 	    char * ausgabeString;
 	    if(j==framePointer){
@@ -133,9 +133,9 @@ void debug(void){
 	      ausgabeString = "            ";
 	    }
 
-	    printf("%s %04d: (%s): ",ausgabeString, j, getTypeOfVariable(j));
+	    printf("%s 0x%08x: (%s): ",ausgabeString, j, getTypeOfVariable(j));
 	    if(stack[j].isNumber == true){
-	      printf("%4d\n", stack[j].u.number);
+	      printf("0x%08x\n", stack[j].u.number);
 	    }else{
 	      if(getHeapAddress(j) == NULL){
 		printf("(nil)\n");
@@ -159,6 +159,8 @@ void debug(void){
 	objAtAddress = (int *) hexZahl;
 	temp = &objAtAddress;
 
+        printf("VMT: 0x%08x\n", temp->u.objRef->vmt);
+
 	/* print obj */
 	if(OBJ_HAS_BYTES(temp->u.objRef)){
 	  for(i=0;i<4;i++){
@@ -167,6 +169,7 @@ void debug(void){
 	}
 	if(OBJ_HAS_OBJREF(temp->u.objRef)){
 	  sizeArray = COUNT_FROM_OBJREF(temp->u.objRef);
+          printf("object holds %d fields\n", sizeArray);
 	  for(i=0;i<sizeArray;i++){
 	    if(temp->u.objRef->data.field[i]!=NULL){
 	      printf("field[%d] = %p\n",i,(void *)temp->u.objRef->data.field[i]);
@@ -175,7 +178,6 @@ void debug(void){
 	    }
 	  }
 	}
-
 	printProgram(programPointer);						
       }
     }else if(strcmp(inputString,"l")==0){
@@ -213,86 +215,99 @@ void debug(void){
 
 /* Gibt das Programm aus */
 void printProgram(unsigned int *code){
-  int zeile;
+  int zeile, index, anzahlArgumente;
   
   zeile = (code[programCounter]&0xFF000000)>>24;
+
+
+
   
   if(zeile==HALT){
-    printf("%03d: halt\n",programCounter);
+    /* ganze Zeile ueberpruefen um festzustellen, ob es wirklich ein HALT ist,
+       oder ob es eine .addr der VMT ist*/
+    if((code[programCounter]&0xFFFFFFFF) == 0){
+        printf("0x%08x: halt\n",programCounter);
+    }else{
+        printf("0x%08x: ???\n",programCounter);
+    }
   }else if(zeile==PUSHC){
-    printf("%03d: pushc %5d\n", programCounter, (SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: pushc %5d\n", programCounter, (SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==ADD){
-    printf("%03d: add\n",programCounter);
+    printf("0x%08x: add\n",programCounter);
   }else if(zeile==SUB){
-    printf("%03d: sub\n",programCounter);
+    printf("0x%08x: sub\n",programCounter);
   }else if(zeile==MUL){
-    printf("%03d: mul\n",programCounter);
+    printf("0x%08x: mul\n",programCounter);
   }else if(zeile==DIV){
-    printf("%03d: div\n",programCounter);
+    printf("0x%08x: div\n",programCounter);
   }else if(zeile==MOD){
-    printf("%03d: mod\n",programCounter);
+    printf("0x%08x: mod\n",programCounter);
   }else if(zeile==RDINT){
-    printf("%03d: rdint\n",programCounter);
+    printf("0x%08x: rdint\n",programCounter);
   }else if(zeile==WRINT){
-    printf("%03d: wrint\n",programCounter);
+    printf("0x%08x: wrint\n",programCounter);
   }else if(zeile==ASF){
-    printf("%03d: asf %7d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: asf %7d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==RSF){
-    printf("%03d: rsf\n",programCounter);
+    printf("0x%08x: rsf\n",programCounter);
   }else if(zeile==PUSHL){
-    printf("%03d: pushl %5d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: pushl %5d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==POPL){
-    printf("%03d: popl %6d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: popl %6d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==EQ){
-    printf("%03d: eq \n",programCounter);
+    printf("0x%08x: eq \n",programCounter);
   }else if(zeile==NE){
-    printf("%03d: ne \n",programCounter);
+    printf("0x%08x: ne \n",programCounter);
   }else if(zeile==LT){
-    printf("%03d: lt \n",programCounter);
+    printf("0x%08x: lt \n",programCounter);
   }else if(zeile==LE){
-    printf("%03d: le \n",programCounter);
+    printf("0x%08x: le \n",programCounter);
   }else if(zeile==GT){
-    printf("%03d: gt \n",programCounter);
+    printf("0x%08x: gt \n",programCounter);
   }else if(zeile==GE){
-    printf("%03d: ge \n",programCounter);
+    printf("0x%08x: ge \n",programCounter);
   }else if(zeile==JMP){
-    printf("%03d: jmp %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: jmp %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==BRF){
-    printf("%03d: brf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: brf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==BRT){
-    printf("%03d: brt %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: brt %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==CALL){
-    printf("%03d: call %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: call %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==RET){
-    printf("%03d: ret\n",programCounter);
+    printf("0x%08x: ret\n",programCounter);
   }else if(zeile==DROP){
-    printf("%03d: drop %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: drop %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==PUSHR){
-    printf("%03d: pushr\n",programCounter);
+    printf("0x%08x: pushr\n",programCounter);
   }else if(zeile==POPR){
-    printf("%03d: popr\n",programCounter);
+    printf("0x%08x: popr\n",programCounter);
   }else if(zeile==DUP){
-    printf("%03d: dup\n",programCounter);
+    printf("0x%08x: dup\n",programCounter);
   }else if(zeile==NEW){
-    printf("%03d: new %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: new %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==GETF){
-    printf("%03d: getf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: getf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==PUTF){
-    printf("%03d: putf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
+    printf("0x%08x: putf %2d\n",programCounter,(SIGN_EXTEND(code[programCounter]&0x00FFFFFF)));
   }else if(zeile==NEWA){
-    printf("%03d: newa\n",programCounter);
+    printf("0x%08x: newa\n",programCounter);
   }else if(zeile==GETLA){
-    printf("%03d: getla\n",programCounter);
+    printf("0x%08x: getla\n",programCounter);
   }else if(zeile==GETFA){
-    printf("%03d: getfa\n",programCounter);
+    printf("0x%08x: getfa\n",programCounter);
   }else if(zeile==PUTFA){
-    printf("%03d: putfa\n",programCounter);
+    printf("0x%08x: putfa\n",programCounter);
   }else if(zeile==PUSHN){
-    printf("%03d: pushn\n",programCounter);
+    printf("0x%08x: pushn\n",programCounter);
   }else if(zeile==REFEQ){
-    printf("%03d: refeq\n",programCounter);
+    printf("0x%08x: refeq\n",programCounter);
   }else if(zeile==REFNE){
-    printf("%03d: refne\n",programCounter);
+    printf("0x%08x: refne\n",programCounter);
+  }else if(zeile==VMCALL){
+    anzahlArgumente = (code[programCounter]&0x00FF0000)>>16;
+    index = (code[programCounter]&0x0000FFFF);
+    printf("0x%08x: vmcall %2d,%2d\n", programCounter, anzahlArgumente, index);
   }
 }
 
@@ -300,6 +315,7 @@ void printProgram(unsigned int *code){
 void program(unsigned int *code){
   int instruction, eingeleseneZahl;
   unsigned int n1, n2;
+  int index, numberOfArgs;
   Object *n1Object, *n2Object;
 
   instruction=(code[programCounter]&0xFF000000)>>24;
@@ -472,6 +488,8 @@ void program(unsigned int *code){
       n1 = IMMEDIATE(code[programCounter]);
       stack[stackPointer].u.objRef = newStackVal(true, n1);
       stack[stackPointer].isNumber = false;
+      programCounter++;
+      stack[stackPointer].u.objRef->vmt = code[programCounter];
       stackPointer++;
       break;
     case GETF:
@@ -490,6 +508,8 @@ void program(unsigned int *code){
       n1 = pop();
       stack[stackPointer].u.objRef = newStackVal(true, n1);
       stack[stackPointer].isNumber = false;
+      programCounter++;
+      stack[stackPointer].u.objRef->vmt = code[programCounter];
       stackPointer++;
       break;
     case GETLA:
@@ -537,6 +557,16 @@ void program(unsigned int *code){
       }else{
 	push(0, false);
       }
+      break;
+    case VMCALL:
+      index = INDEX(code[programCounter]);
+      numberOfArgs = NUMBER_OF_ARGS(code[programCounter]);
+      /* Return-Adresse sichern, indem sie auf den Stack gelegt wird */
+      push(programCounter+1, true);
+      /* programCounter auf die naechste Anweisung setzen */
+      /* -1 weil der programCounter beim naechsten Durchlauf wieder um 1 erhoeht
+         wird*/
+      programCounter = code[stack[stackPointer-2].u.objRef->vmt+index]-1;
       break;
   }
 }
@@ -662,6 +692,7 @@ Object *newStackVal(bool isObject, int size){
     for(i=0; i<size; i++){
       objRef->data.byte[i] = 0;
     }
+    objRef->vmt = 0;
   }else{
     objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(objRef));
     if(objRef==NULL){

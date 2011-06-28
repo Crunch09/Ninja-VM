@@ -49,11 +49,15 @@
 #define PUSHN 35
 #define REFEQ 36
 #define REFNE 37
+
+#define VMCALL 38 /* vmcall <n>,<m> */
 /* end instructions */
 
 
 /* begin makros */
 #define IMMEDIATE(x) ((x) & 0x00FFFFFF)
+#define NUMBER_OF_ARGS(y) (((y) & 0x00FF0000) >> 16)
+#define INDEX(z) ((z) & 0x0000FFFF)
 #define SIGN_EXTEND(i) ((i) & 0x00800000 ? (i) | 0xFF000000 : (i))
 
 #define MSB (1<<(8*sizeof(unsigned int)-1))
@@ -78,6 +82,7 @@ typedef union{
 }Data;
 
 typedef struct object{
+  unsigned int vmt;
   unsigned int size;
   Data data;
 }Object;
