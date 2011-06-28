@@ -319,7 +319,6 @@ void program(unsigned int *code){
     case SUB:
       n1=pop();
       n2=pop();
-printf("%d-%d=%d\n",n2,n1,n2-n1);
       push(n2-n1, false);
       break;
     case MUL:
@@ -510,7 +509,7 @@ printf("%d-%d=%d\n",n2,n1,n2-n1);
       n1 = pop();
       n2Object = popObject();
       if(n1<0 || n1>=COUNT_FROM_OBJREF(n2Object)){
-	printf("putfa %d Error: index out of bounds exception\n", n1);
+	printf("Error: index out of bounds exception\n");
 	exit(-99);
       }
       putf(n1, n1Object, n2Object);
@@ -629,7 +628,7 @@ Object *getf(int index){
   }
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("getf Error: index out of bounds exception\n");
+    printf("Error: index out of bounds exception\n");
     exit(-99);
   }
 
@@ -640,7 +639,7 @@ Object *getf(int index){
 void putf(int index, Object *objValue, Object *objRef){
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("putf Error: index out of bounds exception\n");
+    printf("Error: index out of bounds exception\n");
     exit(-99);
   }
 
