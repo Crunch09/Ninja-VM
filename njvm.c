@@ -13,7 +13,7 @@ const char version[] = "0.5";
 /*int stack[stackSize];*/
 StackItem stack[stackSize];
 
-int returnRegister;
+StackItem returnRegister;
 int stackPointer=0;
 int framePointer=0;
 int programCounter=0; /* zählt die Zeilen bei der Ausgabe */
@@ -457,10 +457,12 @@ printf("%d-%d=%d\n",n2,n1,n2-n1);
       }
       break;
     case PUSHR: /* holt Wert aus returnRegister */
-      push(returnRegister, false);
+      stack[stackPointer] = returnRegister;
+      stackPointer++;
       break;
     case POPR: /* speichert Wert in returnRegister */
-      returnRegister = pop();
+      stackPointer--;
+      returnRegister = stack[stackPointer];
       break;
     case DUP: /* dupliziert obersten Wert in dem Stack */
       stack[stackPointer].isNumber = false;
@@ -623,7 +625,6 @@ Object *getf(int index){
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   stackPointer--;
   objRef = stack[stackPointer].u.objRef;
-  printf("stackPointer: %d\n", stackPointer);
   /*printf("Adresse von objRef: %x\n", (int) *objRef);*/
   if(stackPointer < 0){
     printf("Stackposition out of Range. Program will be stopped.\n");
