@@ -544,11 +544,8 @@ printf("%d-%d=%d\n",n2,n1,n2-n1);
 
 
 /* Vergleicht zwei Zahlen */
-int compare(int zahl1, int zahl2, int instruction){
-  unsigned int n1, n2;
+int compare(int n1, int n2, int instruction){
   bool result = false;
-  n1 = (unsigned int) zahl1;
-  n2 = (unsigned int) zahl2;
   switch(instruction) {
     case EQ: result = (n1 == n2);
       break;
@@ -685,7 +682,7 @@ int getStackVal(int i){
   if(stack[i].isNumber){
     return stack[i].u.number;
   }else{
-    return (int)stack[i].u.objRef->data.byte[0];
+    return *(int*)stack[i].u.objRef->data.byte;
   }
 }
 
