@@ -48,8 +48,7 @@ int main(int argc, char *argv[]){
       }
     }    
   }else{
-    printf("No Arguments, try --help.\n");
-    exit(0);
+    error("No Arguments, try --help.");
   }
 
    return  0;
@@ -69,14 +68,12 @@ void openFile(int i,int argc, char *argv[]){
     fseek(codeFile, 0, SEEK_SET);
     programPointer = malloc(fileSize);
     if( programPointer == NULL){
-      printf("No RAM available. \n");
-      exit(-99);
+      error("No RAM available.");
     }
     /*printf("Size: %d Bytes \n\n", fileSize);*/
     numberOfCommands = fread(programPointer, 4, fileSize/4, codeFile);
     if(numberOfCommands < fileSize/sizeof(programPointer[0])){
-      printf("There occured an error reading the file.  \n");
-      exit(-99);
+      error("There occured an error reading the file.");
     }
   }    
 }
@@ -349,8 +346,7 @@ void program(unsigned int *code){
       if(n1!=0){
         push(n2/n1, false);
       }else{
-        printf("Division by Zero not possible. Programm will be stopped.\n");
-        exit(-99);
+        error("Division by Zero not possible. Programm will be stopped.");
       }
       break;
     case MOD:
@@ -360,8 +356,7 @@ void program(unsigned int *code){
       if(n1!=0){
 	push(n2%n1, false);
       }else{
-	printf("Modulo by Zero not possible. Programm will be stopped.\n");
-         exit(-99);
+         error("Modulo by Zero not possible. Programm will be stopped.");
       }
       break;
     case RDINT: /* liest Zahl auf der konsole ein */
@@ -430,30 +425,26 @@ void program(unsigned int *code){
       n1=pop();
       if(n1 == 0){
         if(numberOfCommands<(IMMEDIATE(code[programCounter]))){
-        	printf("Branch address out of range. Programm will be stopped.");
-        	exit(-99);
+                error("Branch address out of range. Programm will be stopped.");
         }
         programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
       }else if(n1 == 1){
       /* nix */	
       }else{
-        printf("Error in BRF. Stack element is neither 0 nor 1.");
-        exit(-99);	
+        error("Error in BRF. Stack element is neither 0 nor 1.");
       }
       break;
     case BRT:
       n1=pop();
       if(n1 == 1){
         if(numberOfCommands<(IMMEDIATE(code[programCounter]))){
-	        printf("Branch address out of range. Programm will be stopped.");
-        	exit(-99);
+            error("Branch address out of range. Programm will be stopped.");
         }
         programCounter = IMMEDIATE(code[programCounter])-1; /* -1 wegen for-schleifen ++ */
       }else if(n1 == 0){
         /* nix */	
       }else{
-        printf("Error in BRT. Stack element is neither 0 nor 1.");
-        exit(-99);	
+        error("Error in BRT. Stack element is neither 0 nor 1.");
       }
       break;
     case CALL:
@@ -480,6 +471,9 @@ void program(unsigned int *code){
       returnRegister = stack[stackPointer];
       break;
     case DUP: /* dupliziert obersten Wert in dem Stack */
+      if(stack[stackPointer-1].isNumber){
+          error("topObjRef detected number on top of stack");
+      }
       stack[stackPointer].isNumber = false;
       stack[stackPointer].u.objRef = getHeapAddress(stackPointer-1);
       stackPointer++;
@@ -529,8 +523,7 @@ void program(unsigned int *code){
       n1 = pop();
       n2Object = popObject();
       if(n1<0 || n1>=COUNT_FROM_OBJREF(n2Object)){
-	printf("Error: index out of bounds exception\n");
-	exit(-99);
+        error("index out of bounds exception");
       }
       putf(n1, n1Object, n2Object);
       break;
@@ -623,8 +616,7 @@ void push(int num, bool isNumber){
   stackPointer++;
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer > stackSize){
-    printf("Stackposition out of Range. Program will be stopped.\n");
-    exit(-99);
+      error("Stackposition out of Range. Program will be stopped.");
   }
 }
 
@@ -633,8 +625,7 @@ int pop(void){
 
   /* Überprüfen, ob die Position innerhalb des Stacks liegt */
   if(stackPointer < 0){
-    printf("Stackposition out of Range. Program will be stopped.\n");
-    exit(-99);
+      error("Stackposition out of Range. Program will be stopped.");
   }
 
   return getStackVal(stackPointer);
@@ -653,13 +644,11 @@ Object *getf(int index){
   objRef = stack[stackPointer].u.objRef;
   /*printf("Adresse von objRef: %x\n", (int) *objRef);*/
   if(stackPointer < 0){
-    printf("Stackposition out of Range. Program will be stopped.\n");
-    exit(-99);
+    error("Stackposition out of Range. Program will be stopped.");
   }
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("Error: index out of bounds exception\n");
-    exit(-99);
+    error("index out of bounds exception");
   }
 
   return objRef->data.field[index];
@@ -669,8 +658,7 @@ Object *getf(int index){
 void putf(int index, Object *objValue, Object *objRef){
 
   if(index >= (COUNT_FROM_OBJREF(objRef)) || index < 0){
-    printf("Error: index out of bounds exception\n");
-    exit(-99);
+    error("index out of bounds exception");
   }
 
   objRef->data.field[index] = objValue;
@@ -684,8 +672,7 @@ Object *newStackVal(bool isObject, int size){
   if(!isObject){
     objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(int));
     if(objRef==NULL){
-      printf("no memory");
-      exit(-99);
+      error("no memory");
     }
 
     objRef->size = (unsigned int)(1*sizeof(unsigned int) | MSB );
@@ -696,8 +683,7 @@ Object *newStackVal(bool isObject, int size){
   }else{
     objRef = malloc(sizeof(Object)-sizeof(Data)+size*sizeof(objRef));
     if(objRef==NULL){
-      printf("no memory");
-      exit(-99);
+      error("no memory");
     }
     objRef->size = size;
     for(i=0; i<size; i++){
@@ -736,6 +722,11 @@ void nullStackFrame(int frameP, int stackP){
         stack[frameP].u.objRef = NULL;
         frameP++;
     }
+}
+
+void error(char *errMsg){
+    printf("Error: %s\n", errMsg);
+    exit(-99);
 }
 
 

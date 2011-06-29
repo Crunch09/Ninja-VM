@@ -118,3 +118,4 @@ void *getHeapAddress(int i);
 Object *getf(int index);
 void putf(int index, Object *objValue, Object *objRef);
 void nullStackFrame(int frameP, int stackP);
+void error(char *errMsg);
