@@ -566,7 +566,7 @@ void program(unsigned int *code){
       /* programCounter auf die naechste Anweisung setzen */
       /* -1 weil der programCounter beim naechsten Durchlauf wieder um 1 erhoeht
          wird*/
-      programCounter = code[stack[stackPointer-2].u.objRef->vmt+index]-1;
+      programCounter = code[stack[stackPointer-(numberOfArgs+1)].u.objRef->vmt+index]-1;
       break;
   }
 }
