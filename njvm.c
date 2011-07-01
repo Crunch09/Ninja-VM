@@ -144,32 +144,27 @@ void debug(void){
       	}
       	printf("--- bottom of stack ---\n");	
       }else if(strcmp(inputString, "o")== 0){
-	unsigned long hexZahl;
-	char zahl[12];
-	/*StackItem objAtAddress;*/
-	int *objAtAddress;
-	StackItem *temp;
+	
+	ObjRef temp;
 
 	printf("object reference? 0x");
-	scanf("%12s", zahl);
-	hexZahl = strtoul(zahl, NULL, 16);
-	objAtAddress = (int *) hexZahl;
-	temp = &objAtAddress;
+	scanf("%p", (void **) &temp);
 
-        printf("VMT: 0x%08x\n", temp->u.objRef->vmt);
+
+  printf("VMT: 0x%08x\n", temp->vmt);
 
 	/* print obj */
-	if(OBJ_HAS_BYTES(temp->u.objRef)){
+	if(OBJ_HAS_BYTES(temp)){
 	  for(i=0;i<4;i++){
-	    printf("byte[%d] = 0x%02x\n", i, temp->u.objRef->data.byte[i]);
+	    printf("byte[%d] = 0x%02x\n", i, temp->data.byte[i]);
 	  }
 	}
-	if(OBJ_HAS_OBJREF(temp->u.objRef)){
-	  sizeArray = COUNT_FROM_OBJREF(temp->u.objRef);
+	if(OBJ_HAS_OBJREF(temp)){
+	  sizeArray = COUNT_FROM_OBJREF(temp);
           printf("object holds %d fields\n", sizeArray);
 	  for(i=0;i<sizeArray;i++){
-	    if(temp->u.objRef->data.field[i]!=NULL){
-	      printf("field[%d] = %p\n",i,(void *)temp->u.objRef->data.field[i]);
+	    if(temp->data.field[i]!=NULL){
+	      printf("field[%d] = %p\n",i,(void *)temp->data.field[i]);
 	    }else{
 	      printf("field[%d] = nil\n",i);
 	    }
